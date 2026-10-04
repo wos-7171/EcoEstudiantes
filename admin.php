@@ -40,6 +40,7 @@ $res_mensajes = $conexion->query(
     "SELECT id_mensaje, nombre, correo, asunto, fecha_envio, estado
      FROM mensajes_contacto ORDER BY fecha_envio DESC LIMIT 10"
 );
+$res_galeria = $conexion->query("SELECT id_foto, titulo, archivo, fecha_subida FROM galeria ORDER BY fecha_subida DESC");
 
 // Instituciones (para el resumen)
 $res_instituciones = $conexion->query("SELECT COUNT(*) AS n FROM instituciones");
@@ -172,6 +173,36 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                 </td>
             </tr>
             <?php endwhile; endif; ?>
+        </tbody>
+    </table>
+
+    <h2>Galeria</h2>
+    <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="accion" value="subir_galeria">
+        <input type="text" name="titulo" placeholder="Titulo de la foto" maxlength="120" required>
+        <input type="file" name="foto" accept="image/jpeg,image/png,image/webp,image/gif" required>
+        <p class="ayuda">JPG, PNG, WEBP o GIF. Maximo 5 MB. Se ve en la pagina Galeria.</p>
+        <button type="submit">Publicar en la galeria</button>
+    </form>
+    <table>
+        <thead><tr><th>Foto</th><th>Titulo</th><th>Fecha</th><th></th></tr></thead>
+        <tbody>
+        <?php if ($res_galeria->num_rows === 0): ?>
+            <tr><td colspan="4">Todavia no hay fotos publicadas.</td></tr>
+        <?php else: while ($g = $res_galeria->fetch_assoc()): ?>
+            <tr>
+                <td><img src="images/galeria/<?php echo rawurlencode($g['archivo']); ?>" alt="" style="width:72px;height:52px;object-fit:cover;"></td>
+                <td><?php echo htmlspecialchars($g['titulo']); ?></td>
+                <td><?php echo date("d/m/Y", strtotime($g['fecha_subida'])); ?></td>
+                <td>
+                    <form action="admin_acciones.php" method="POST" onsubmit="return confirm('¿Quitar esta foto de la galeria?');">
+                        <input type="hidden" name="accion" value="eliminar_galeria">
+                        <input type="hidden" name="id" value="<?php echo (int)$g['id_foto']; ?>">
+                        <button type="submit" class="link link-del">Quitar</button>
+                    </form>
+                </td>
+            </tr>
+        <?php endwhile; endif; ?>
         </tbody>
     </table>
 

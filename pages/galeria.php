@@ -1,11 +1,13 @@
 <?php
 session_start();
+include("../conexion.php");
 if (!isset($_SESSION["id_usuario"])) {
     header("Location: ../index.php");
     exit();
 }
 $rol = $_SESSION["rol"];
 $prefix = "../";
+$fotos = $conexion->query("SELECT titulo, archivo FROM galeria ORDER BY fecha_subida DESC");
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -16,7 +18,7 @@ $prefix = "../";
     <title>Galería - EcoEstudiantes Digitales</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:w极@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 
@@ -28,42 +30,17 @@ $prefix = "../";
 
             <section class="gallery">
                 <div class="grid gallery-grid">
+                    <?php if ($fotos && $fotos->num_rows > 0): while ($foto = $fotos->fetch_assoc()): ?>
                     <figure class="gallery-item">
-                        <img src="https://www.el19digital.com/files/articulos/251016.jpeg" alt="Estudiantes sembrando un árbol">
-                        <!-- Imagen importada automáticamente -->
-                        <figcaption>Estudiantes sembrando un árbol </figcaption>
+                        <img src="../images/galeria/<?php echo rawurlencode($foto['archivo']); ?>" alt="<?php echo htmlspecialchars($foto['titulo']); ?>">
+                        <figcaption><?php echo htmlspecialchars($foto['titulo']); ?></figcaption>
                     </figure>
-
+                    <?php endwhile; else: ?>
                     <figure class="gallery-item">
-                        <img src="https://colaborativo.net/wp-content/uploads/2018/07/energia-solar.png" alt="Escuela con paneles solares">
-                        <!-- Imagen importada automáticamente -->
-                        <figcaption>Escuela con paneles solares </figcaption>
+                        <img src="https://www.el19digital.com/files/articulos/251016.jpeg" alt="Estudiantes sembrando un arbol">
+                        <figcaption>Ejemplo: estudiantes sembrando un arbol. El administrador puede publicar las fotos del colegio.</figcaption>
                     </figure>
-
-                    <figure class="gallery-item">
-                        <img src="https://img.freepik.com/fotos-premium/laptop-grafico_253658-3741.jpg" alt="Laptop con gráficos ambientales">
-                        <!-- Imagen importada automáticamente -->
-                        <figcaption>Laptop con gráficos ambientales </figcaption>
-                    </figure>
-
-                    <figure class="gallery-item">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbRe-EOvSrxtvN98TK44BTrcP7eGH1YPHZLA&s" alt="Actividades de reciclaje">
-                        <!-- Imagen importada automáticamente -->
-                        <figcaption>Reciclaje en la escuela </figcaption>
-                    </figure>
-
-                    <figure class="gallery-item">
-                        <img src="https://chilebio.cl/wp-content/uploads/2021/08/peces1.jpg
-                        " alt="Río limpio con peces">
-                        <!-- Imagen importada automáticamente -->
-                        <figcaption>Río limpio con peces </figcaption>
-                    </figure>
-
-                    <figure class="gallery-item">
-                        <img src="https://bogota.gov.co/sites/default/files/styles/1050px/public/h1.jpg" alt="Estudiantes en huerta escolar">
-                        <!-- Imagen importada automáticamente -->
-                        <figcaption>Huerta escolar comunitaria </figcaption>
-                    </figure>
+                    <?php endif; ?>
                 </div>
             </section>
 

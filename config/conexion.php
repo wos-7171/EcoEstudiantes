@@ -90,4 +90,12 @@ if ($tabla_proy && $tabla_proy->num_rows > 0) {
         $conexion->query("ALTER TABLE proyectos_prae ADD COLUMN impacto VARCHAR(20) NULL");
     }
 }
+$conexion->query(
+    "CREATE TABLE IF NOT EXISTS galeria (
+        id_foto INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        titulo VARCHAR(120) NOT NULL,
+        archivo VARCHAR(255) NOT NULL,
+        fecha_subida DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
 ?>
