@@ -3,30 +3,26 @@ session_start();
 include("conexion.php");
 include("funciones.php");
 
-// Verificar sesión y rol de administrador
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
     header("Location: index.php");
     exit();
 }
 
-// Usuarios + nombre de su rol
 $res_usuarios = $conexion->query(
     "SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.id_rol, r.nombre AS rol, u.estado
      FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
      ORDER BY u.id_usuario DESC"
 );
 
-// Roles disponibles (para el <select> de creación)
 $res_roles = $conexion->query("SELECT id_rol, nombre FROM roles ORDER BY id_rol");
 
-// Noticias + autor
 $res_noticias = $conexion->query(
-    "SELECT n.id_noticia, n.titulo, n.fecha_publicacion, u.nombre AS autor
+    "SELECT n.id_noticia, n.titulo, n.fecha_publicacion, u.nombre AS autor,
+            (SELECT COUNT(*) FROM noticias_imagenes ni WHERE ni.id_noticia = n.id_noticia) AS num_imagenes
      FROM noticias n LEFT JOIN usuarios u ON u.id_usuario = n.id_usuario
      ORDER BY n.fecha_publicacion DESC"
 );
 
-// Proyectos PRAE (resumen)
 $res_proyectos = $conexion->query(
     "SELECT p.id_proyecto, p.nombre, p.estado, u.nombre AS responsable,
             (SELECT COUNT(*) FROM actividades a WHERE a.id_proyecto = p.id_proyecto) AS num_actividades
@@ -34,13 +30,11 @@ $res_proyectos = $conexion->query(
      ORDER BY p.fecha_creacion DESC"
 );
 
-// Mensajes de contacto pendientes
 $res_mensajes = $conexion->query(
     "SELECT id_mensaje, nombre, correo, asunto, fecha_envio, estado
      FROM mensajes_contacto ORDER BY fecha_envio DESC LIMIT 10"
 );
 
-// Instituciones (para el resumen)
 $res_instituciones = $conexion->query("SELECT COUNT(*) AS n FROM instituciones");
 $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
 ?>
@@ -60,7 +54,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         th, td { padding: 10px; text-align: left; vertical-align: middle; }
         th { background-color: #2e7d32; color: white; }
         form { background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #e0e0e0; margin-top: 15px; }
-        input[type="text"], input[type="email"], input[type="password"], select, textarea {
+        input[type="text"], input[type="email"], input[type="password"], input[type="file"], select, textarea {
             width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
         }
         button { background-color: #2e7d32; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; }
@@ -87,6 +81,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         .kpi { background: #e8f5e9; border-radius: 8px; padding: 12px; text-align: center; }
         .kpi .num { display: block; font-size: 1.6rem; font-weight: 700; color: #1b5e20; }
         .kpi .lbl { font-size: 0.78rem; color: #555; }
+        .ayuda { margin: 0 0 8px; color: #666; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -114,7 +109,6 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         <div class="kpi"><span class="num"><?php echo $res_noticias->num_rows; ?></span><span class="lbl">Noticias</span></div>
     </div>
 
-    <!-- SECCIÓN USUARIOS -->
     <h2>Gestión de Usuarios</h2>
 
     <h3>Crear Nuevo Usuario</h3>
@@ -168,31 +162,42 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 
-    <!-- SECCIÓN NOTICIAS -->
     <h2>Gestión de Noticias y Contenido</h2>
 
     <h3>Publicar Nueva Noticia</h3>
-    <form action="admin_acciones.php" method="POST">
+    <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="accion" value="crear_noticia">
         <input type="text" name="titulo" placeholder="Título de la noticia" maxlength="200" required>
         <textarea name="contenido" placeholder="Escribe aquí el contenido de la noticia..." rows="5" required></textarea>
+        <label for="imagenes">Imagenes de la noticia (opcional, maximo 3)</label>
+        <input type="file" id="imagenes" name="imagenes[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+        <p class="ayuda">JPG, PNG, WEBP o GIF. Hasta 3 imagenes, de 5 MB cada una. Se muestran completas, sin estirarlas.</p>
         <button type="submit">Publicar Noticia</button>
     </form>
+    <script>
+    document.getElementById('imagenes').addEventListener('change', function () {
+        if (this.files.length > 3) {
+            alert('Solo se pueden anexar 3 imagenes. Elige de nuevo.');
+            this.value = '';
+        }
+    });
+    </script>
 
     <h3>Noticias Publicadas</h3>
     <table>
         <thead>
-            <tr><th>ID</th><th>Título</th><th>Autor</th><th>Fecha</th><th>Acciones</th></tr>
+            <tr><th>ID</th><th>Título</th><th>Autor</th><th>Fecha</th><th>Imagenes</th><th>Acciones</th></tr>
         </thead>
         <tbody>
             <?php if ($res_noticias->num_rows === 0): ?>
-            <tr><td colspan="5" style="text-align:center; color:#666;">Todavía no hay noticias publicadas.</td></tr>
+            <tr><td colspan="6" style="text-align:center; color:#666;">Todavía no hay noticias publicadas.</td></tr>
             <?php else: while ($n = $res_noticias->fetch_assoc()): ?>
             <tr>
                 <td><?php echo $n['id_noticia']; ?></td>
                 <td><?php echo htmlspecialchars($n['titulo']); ?></td>
                 <td><?php echo htmlspecialchars($n['autor'] ?? 'EcoEstudiantes'); ?></td>
                 <td><?php echo date("d/m/Y", strtotime($n['fecha_publicacion'])); ?></td>
+                <td><?php echo (int)$n['num_imagenes']; ?></td>
                 <td>
                     <form action="admin_acciones.php" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta noticia?')">
                         <input type="hidden" name="accion" value="eliminar_noticia">
@@ -205,7 +210,6 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 
-    <!-- SECCIÓN PROYECTOS PRAE -->
     <h2>Proyectos PRAE (resumen)</h2>
     <table>
         <thead>
@@ -226,7 +230,6 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 
-    <!-- SECCIÓN MENSAJES DE CONTACTO -->
     <h2>Últimos Mensajes de Contacto <a class="btn-link" href="mensajes.php" style="font-size:0.9rem;">Ver todos</a></h2>
     <table>
         <thead>
