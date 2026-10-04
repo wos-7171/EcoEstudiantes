@@ -141,24 +141,29 @@ $evolucion = consultar($conexion,
        AND YEAR(COALESCE(a.fecha_actividad, DATE(a.fecha_creacion))) BETWEEN 2015 AND $anio_max
      GROUP BY mes ORDER BY mes",
     $es_admin, $id_usuario);
-$g_evo_lbl = array_column($evolucion, 'mes');
-$g_evo_tot = array_map('intval', array_column($evolucion, 'actividades'));
-$g_evo_fin = array_map('intval', array_column($evolucion, 'finalizadas'));
-$mapa_tot = array_combine($g_evo_lbl, $g_evo_tot) ?: [];
-$mapa_fin = array_combine($g_evo_lbl, $g_evo_fin) ?: [];
-$inicio = $g_evo_lbl ? min($g_evo_lbl) : date('Y-m');
-$fin = max($g_evo_lbl ? max($g_evo_lbl) : date('Y-m'), date('Y-m'));
+$mapa_tot = [];
+$mapa_fin = [];
+foreach ($evolucion as $fila) {
+    $mapa_tot[$fila['mes']] = (int)$fila['actividades'];
+    $mapa_fin[$fila['mes']] = (int)$fila['finalizadas'];
+}
+$nombres_mes = [1 => 'ene', 2 => 'feb', 3 => 'mar', 4 => 'abr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'ago', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dic'];
+$inicio = $mapa_tot ? min(array_keys($mapa_tot)) : date('Y-m');
+$fin = max($mapa_tot ? max(array_keys($mapa_tot)) : date('Y-m'), date('Y-m'));
 $cursor = DateTime::createFromFormat('Y-m-d', $inicio . '-01');
-$cursor->modify('-2 months');
 $limite = DateTime::createFromFormat('Y-m-d', $fin . '-01');
 $g_evo_lbl = [];
 $g_evo_tot = [];
 $g_evo_fin = [];
+$acum_tot = 0;
+$acum_fin = 0;
 while ($cursor <= $limite) {
     $mes = $cursor->format('Y-m');
-    $g_evo_lbl[] = $mes;
-    $g_evo_tot[] = $mapa_tot[$mes] ?? 0;
-    $g_evo_fin[] = $mapa_fin[$mes] ?? 0;
+    $acum_tot += $mapa_tot[$mes] ?? 0;
+    $acum_fin += $mapa_fin[$mes] ?? 0;
+    $g_evo_lbl[] = $nombres_mes[(int)$cursor->format('n')] . ' ' . $cursor->format('Y');
+    $g_evo_tot[] = $acum_tot;
+    $g_evo_fin[] = $acum_fin;
     $cursor->modify('+1 month');
 }
 
@@ -230,7 +235,7 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
         </div>
         <div class="chart-box" style="grid-column: 1 / -1;">
             <h3>Evolucion de actividades en el tiempo</h3>
-            <p class="meta">La linea azul cuenta las actividades de ese mes. La verde cuenta las que estan finalizadas. Si el proyecto pasa a Finalizado, sus actividades tambien quedan finalizadas.</p>
+            <p class="meta">Muestra como van creciendo las actividades. La linea azul es el total acumulado hasta ese mes. La verde es cuantas de esas ya estan finalizadas. No baja: cada mes suma lo nuevo.</p>
             <div class="chart-wrap"><canvas id="gEvolucion"></canvas></div>
         </div>
     </div>
@@ -321,8 +326,8 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
         data: {
             labels: <?php echo json_encode($g_evo_lbl, $opts); ?>,
             datasets: [
-                { label: 'Actividades', data: <?php echo json_encode($g_evo_tot); ?>, borderColor: azul, backgroundColor: 'rgba(25,118,210,0.15)', tension: 0.25, borderWidth: 3, pointRadius: 5, fill: true },
-                { label: 'Finalizadas', data: <?php echo json_encode($g_evo_fin); ?>, borderColor: verde, backgroundColor: 'rgba(46,125,50,0.12)', tension: 0.25, borderWidth: 3, pointRadius: 5, fill: true }
+                { label: 'Total acumulado', data: <?php echo json_encode($g_evo_tot); ?>, borderColor: azul, backgroundColor: 'rgba(25,118,210,0.15)', tension: 0.2, borderWidth: 3, pointRadius: 4, fill: true },
+                { label: 'Finalizadas acumuladas', data: <?php echo json_encode($g_evo_fin); ?>, borderColor: verde, backgroundColor: 'rgba(46,125,50,0.12)', tension: 0.2, borderWidth: 3, pointRadius: 4, fill: true }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: entero } }
