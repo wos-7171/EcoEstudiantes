@@ -192,6 +192,11 @@ $rol = trim((string)$rol);
                     Mis mensajes
                 </a>
             </li>
+            <li>
+                <a href="<?php echo htmlspecialchars($prefix); ?>manual.php">
+                    Manual de usuario
+                </a>
+            </li>
 
 
             <!-- INFORMACIÓN -->
