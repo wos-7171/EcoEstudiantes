@@ -2,7 +2,6 @@
 session_start();
 include("conexion.php");
 
-// Solo el administrador lee los mensajes de contacto
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
     header("Location: index.php");
     exit();
@@ -10,7 +9,7 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
 $rol = $_SESSION["rol"];
 
 $res = $conexion->query(
-    "SELECT id_mensaje, nombre, correo, asunto, mensaje, fecha_envio, estado
+    "SELECT id_mensaje, nombre, correo, asunto, mensaje, fecha_envio, estado, respuesta, fecha_respuesta
      FROM mensajes_contacto ORDER BY (estado = 'Nuevo') DESC, fecha_envio DESC"
 );
 ?>
@@ -29,6 +28,8 @@ $res = $conexion->query(
 <div class="app-section">
     <div class="breadcrumb"><a href="admin.php">Panel de administracion</a></div>
     <h1>Mensajes de contacto</h1>
+    <?php if (!empty($_SESSION['flash_ok'])): ?><div class="aviso aviso-ok"><?php echo htmlspecialchars($_SESSION['flash_ok']); unset($_SESSION['flash_ok']); ?></div><?php endif; ?>
+    <?php if (!empty($_SESSION['flash_error'])): ?><div class="aviso aviso-error"><?php echo htmlspecialchars($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?></div><?php endif; ?>
 
     <?php if ($res->num_rows === 0): ?>
         <p class="vacio">No hay mensajes de contacto todavia.</p>
@@ -42,6 +43,19 @@ $res = $conexion->query(
             &nbsp;|&nbsp; <?php echo date("d/m/Y H:i", strtotime($m['fecha_envio'])); ?>
             &nbsp;<span class="badge-estado <?php echo $clase; ?>"><?php echo htmlspecialchars($m['estado']); ?></span></p>
         <p><?php echo nl2br(htmlspecialchars($m['mensaje'])); ?></p>
+        <?php if (!empty($m['respuesta'])): ?>
+            <div class="aviso aviso-ok">
+                <strong>Respuesta enviada<?php echo $m['fecha_respuesta'] ? ' el ' . date("d/m/Y H:i", strtotime($m['fecha_respuesta'])) : ''; ?>:</strong><br>
+                <?php echo nl2br(htmlspecialchars($m['respuesta'])); ?>
+            </div>
+        <?php endif; ?>
+        <form action="mensajes_acciones.php" method="POST">
+            <input type="hidden" name="accion" value="responder">
+            <input type="hidden" name="id_mensaje" value="<?php echo (int)$m['id_mensaje']; ?>">
+            <label for="resp<?php echo (int)$m['id_mensaje']; ?>">Responder al usuario</label>
+            <textarea id="resp<?php echo (int)$m['id_mensaje']; ?>" name="respuesta" rows="3" maxlength="2000" required><?php echo htmlspecialchars($m['respuesta'] ?? ''); ?></textarea>
+            <button type="submit"><?php echo empty($m['respuesta']) ? 'Enviar respuesta' : 'Actualizar respuesta'; ?></button>
+        </form>
         <div class="acciones-fila">
             <?php foreach (['Leído', 'Respondido', 'Archivado'] as $nuevo): if ($m['estado'] !== $nuevo): ?>
             <form action="mensajes_acciones.php" method="POST" style="display:inline;">
