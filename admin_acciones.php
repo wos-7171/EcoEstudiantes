@@ -3,7 +3,6 @@ session_start();
 include("conexion.php");
 include("funciones.php");
 
-// Verificacion de seguridad: solo el Administrador, y solo por POST
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
     header("Location: index.php");
     exit();
@@ -18,7 +17,6 @@ $accion = $_POST['accion'] ?? '';
 
 try {
 
-    // 1. CREAR USUARIO
     if ($accion === 'crear_usuario') {
         $nombre = trim($_POST['nombre'] ?? '');
         $apellido = trim($_POST['apellido'] ?? '');
@@ -65,7 +63,6 @@ try {
         }
     }
 
-    // 2. EDITAR USUARIO (datos y, opcionalmente, nueva contraseña)
     if ($accion === 'editar_usuario') {
         $id = intval($_POST['id'] ?? 0);
         $nombre = trim($_POST['nombre'] ?? '');
@@ -122,8 +119,6 @@ try {
                 }
                 $stmt->execute();
                 $stmt->close();
-
-                // Si el usuario editado es el que esta en sesion, refresca sus datos de sesion
                 if ($id === $id_yo) {
                     $_SESSION['nombre'] = $nombre . ' ' . $apellido;
                     $_SESSION['correo'] = $correo;
@@ -133,20 +128,16 @@ try {
         }
     }
 
-    // 3. ELIMINAR USUARIO
     if ($accion === 'eliminar_usuario') {
         $id = intval($_POST['id'] ?? 0);
-
         if ($id === $id_yo) {
             flash_error("No puedes eliminar tu propia cuenta mientras estas en sesion.");
         } else {
-            // Si es responsable de proyectos, no se elimina (quedarian proyectos sin dueño)
             $stmt = $conexion->prepare("SELECT COUNT(*) AS n FROM proyectos_prae WHERE id_responsable = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $n_proy = (int)$stmt->get_result()->fetch_assoc()['n'];
             $stmt->close();
-
             if ($n_proy > 0) {
                 flash_error("Ese usuario es responsable de $n_proy proyecto(s). Elimina esos proyectos primero, o desactiva al usuario en lugar de eliminarlo.");
             } else {
@@ -159,7 +150,6 @@ try {
                     $archivos[] = $f['archivo'];
                 }
                 $stmt->close();
-
                 $conexion->begin_transaction();
                 try {
                     foreach ([
@@ -186,7 +176,6 @@ try {
         }
     }
 
-    // 4. ACTIVAR / DESACTIVAR USUARIO
     if ($accion === 'cambiar_estado_usuario') {
         $id = intval($_POST['id'] ?? 0);
         if ($id === $id_yo) {
@@ -200,24 +189,38 @@ try {
         }
     }
 
-    // 5. CREAR NOTICIA
     if ($accion === 'crear_noticia') {
         $titulo = trim($_POST['titulo'] ?? '');
         $contenido = trim($_POST['contenido'] ?? '');
         if ($titulo === '' || $contenido === '') {
             flash_error("La noticia necesita titulo y contenido.");
+        } elseif (mb_strlen($titulo) > 200) {
+            flash_error("El titulo no puede pasar de 200 caracteres.");
         } else {
             $stmt = $conexion->prepare("INSERT INTO noticias (id_usuario, titulo, contenido) VALUES (?, ?, ?)");
             $stmt->bind_param("iss", $id_yo, $titulo, $contenido);
             $stmt->execute();
+            $id_noticia = (int)$stmt->insert_id;
             $stmt->close();
-            flash_ok("Noticia publicada.");
+            $aviso_img = guardar_imagenes_noticia($conexion, $id_noticia);
+            flash_ok($aviso_img === '' ? "Noticia publicada." : "Noticia publicada. " . $aviso_img);
         }
     }
 
-    // 6. ELIMINAR NOTICIA
     if ($accion === 'eliminar_noticia') {
         $id = intval($_POST['id'] ?? 0);
+        $stmt = $conexion->prepare("SELECT archivo FROM noticias_imagenes WHERE id_noticia = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $imgs = $stmt->get_result();
+        $carpeta = __DIR__ . "/images/noticias/";
+        while ($img = $imgs->fetch_assoc()) {
+            $ruta = $carpeta . basename($img['archivo']);
+            if (is_file($ruta)) {
+                unlink($ruta);
+            }
+        }
+        $stmt->close();
         $stmt = $conexion->prepare("DELETE FROM noticias WHERE id_noticia = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -232,3 +235,76 @@ try {
 $conexion->close();
 header("Location: admin.php");
 exit();
+
+function guardar_imagenes_noticia($conexion, $id_noticia) {
+    if ($id_noticia <= 0 || !isset($_FILES['imagenes']) || !is_array($_FILES['imagenes']['name'])) {
+        return '';
+    }
+    $carpeta = __DIR__ . "/images/noticias/";
+    if (!is_dir($carpeta)) {
+        mkdir($carpeta, 0755, true);
+    }
+    if (!file_exists($carpeta . ".htaccess")) {
+        file_put_contents($carpeta . ".htaccess",
+            "Options -Indexes -ExecCGI\n" .
+            "<FilesMatch \"\\.(php|php[0-9]|phtml|phar|pl|py|cgi|sh|exe|html?|js|svg)$\">\n    Require all denied\n</FilesMatch>\n" .
+            "<IfModule mod_php.c>\n    php_flag engine off\n</IfModule>\n" .
+            "<IfModule mod_php8.c>\n    php_flag engine off\n</IfModule>\n");
+    }
+    $permitidas = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp'];
+    $max_bytes = 5 * 1024 * 1024;
+    $nombres = $_FILES['imagenes']['name'];
+    $total = count($nombres);
+    $guardadas = 0;
+    $rechazadas = 0;
+    $de_mas = 0;
+    $stmt = $conexion->prepare("INSERT INTO noticias_imagenes (id_noticia, archivo, orden) VALUES (?, ?, ?)");
+    for ($i = 0; $i < $total; $i++) {
+        if (($_FILES['imagenes']['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+        if ($guardadas >= 3) {
+            $de_mas++;
+            continue;
+        }
+        $error = $_FILES['imagenes']['error'][$i];
+        $tmp = $_FILES['imagenes']['tmp_name'][$i];
+        $ext = strtolower(pathinfo($nombres[$i], PATHINFO_EXTENSION));
+        $tam = (int)($_FILES['imagenes']['size'][$i] ?? 0);
+        if ($error !== UPLOAD_ERR_OK || $tam <= 0 || $tam > $max_bytes || !isset($permitidas[$ext])) {
+            $rechazadas++;
+            continue;
+        }
+        $cabecera = file_get_contents($tmp, false, null, 0, 800);
+        if ($cabecera !== false && preg_match('/<\?(php|=)/i', $cabecera)) {
+            $rechazadas++;
+            continue;
+        }
+        $info = @getimagesize($tmp);
+        if ($info === false || ($info['mime'] ?? '') !== $permitidas[$ext]) {
+            $rechazadas++;
+            continue;
+        }
+        $nombre_guardado = bin2hex(random_bytes(16)) . "." . $ext;
+        if (!move_uploaded_file($tmp, $carpeta . $nombre_guardado)) {
+            $rechazadas++;
+            continue;
+        }
+        $orden = $guardadas + 1;
+        $stmt->bind_param("isi", $id_noticia, $nombre_guardado, $orden);
+        $stmt->execute();
+        $guardadas++;
+    }
+    $stmt->close();
+    $partes = [];
+    if ($guardadas > 0) {
+        $partes[] = $guardadas . " imagen" . ($guardadas === 1 ? "" : "es") . " anexada" . ($guardadas === 1 ? "" : "s");
+    }
+    if ($de_mas > 0) {
+        $partes[] = "solo se permiten 3, las demas no se guardaron";
+    }
+    if ($rechazadas > 0) {
+        $partes[] = $rechazadas . " archivo" . ($rechazadas === 1 ? "" : "s") . " no era una imagen valida o pesaba mas de 5 MB";
+    }
+    return implode(". ", $partes);
+}
