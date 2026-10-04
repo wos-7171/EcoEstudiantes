@@ -1,17 +1,10 @@
-// ═══════════════════════════════════════════════════════════
-// PARTE 1 — Referencias del DOM
-// ═══════════════════════════════════════════════════════════
 const passInput = document.getElementById('password');
 const toggleBtn = document.getElementById('togglePass');
-
 const regPassword = document.getElementById('regPassword');
 const regPasswordConf = document.getElementById('regPasswordConf');
 const toggleRegBtn = document.getElementById('toggleRegPass');
 const toggleRegConfBtn = document.getElementById('toggleRegPassConf');
 
-// ═══════════════════════════════════════════════════════════
-// PARTE 2 — Validaciones reutilizables
-// ═══════════════════════════════════════════════════════════
 function validarPassword(pass) {
     const errores = [];
     if (pass.length < 8) errores.push('Mínimo 8 caracteres');
@@ -20,9 +13,6 @@ function validarPassword(pass) {
     return errores;
 }
 
-// ═══════════════════════════════════════════════════════════
-// PARTE 3 — Mostrar / Ocultar contraseñas
-// ═══════════════════════════════════════════════════════════
 function crearToggle(btn, input) {
     if (!btn || !input) return;
     btn.addEventListener('click', () => {
@@ -40,9 +30,6 @@ crearToggle(toggleBtn, passInput);
 crearToggle(toggleRegBtn, regPassword);
 crearToggle(toggleRegConfBtn, regPasswordConf);
 
-// ═══════════════════════════════════════════════════════════
-// PARTE 4 — Medidor de fortaleza de contraseña (registro)
-// ═══════════════════════════════════════════════════════════
 const barraFuerza = document.getElementById('barraFuerza');
 const textoFuerza = document.getElementById('textoFuerza');
 
@@ -50,23 +37,18 @@ if (regPassword) {
     regPassword.addEventListener('input', () => {
         const errores = validarPassword(regPassword.value);
         const puntaje = 3 - errores.length;
-
         const config = [
             { pct: '0%', color: '#e0e0e0', label: '' },
             { pct: '33%', color: '#e53935', label: 'Débil' },
             { pct: '66%', color: '#ffb300', label: 'Regular' },
             { pct: '100%', color: '#43a047', label: 'Fuerte' },
         ][puntaje];
-
         barraFuerza.style.width = config.pct;
         barraFuerza.style.background = config.color;
         textoFuerza.textContent = config.label;
     });
 }
 
-// ═══════════════════════════════════════════════════════════
-// PARTE 5 — Alternar entre Login y Registro
-// ═══════════════════════════════════════════════════════════
 function mostrarTab(tab) {
     const panelLogin = document.getElementById('panelLogin');
     const panelRegistro = document.getElementById('panelRegistro');
@@ -76,11 +58,17 @@ function mostrarTab(tab) {
     if (tab === 'login') {
         panelLogin.style.display = 'block';
         panelRegistro.style.display = 'none';
+        panelLogin.style.animation = 'none';
+        void panelLogin.offsetWidth;
+        panelLogin.style.animation = '';
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
     } else {
         panelLogin.style.display = 'none';
         panelRegistro.style.display = 'block';
+        panelRegistro.style.animation = 'none';
+        void panelRegistro.offsetWidth;
+        panelRegistro.style.animation = '';
         tabLogin.classList.remove('active');
         tabRegister.classList.add('active');
     }
