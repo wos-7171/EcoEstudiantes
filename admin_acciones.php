@@ -274,6 +274,50 @@ try {
         }
     }
 
+    if ($accion === 'editar_galeria') {
+        $id = intval($_POST['id'] ?? 0);
+        $titulo = mb_substr(trim($_POST['titulo'] ?? ''), 0, 120);
+        if ($id <= 0 || $titulo === '') {
+            flash_error("Escribe el titulo de la foto.");
+        } else {
+            $stmt = $conexion->prepare("UPDATE galeria SET titulo = ? WHERE id_foto = ?");
+            $stmt->bind_param("si", $titulo, $id);
+            $stmt->execute();
+            $stmt->close();
+            $archivo = $_FILES['foto'] ?? null;
+            if ($archivo && ($archivo['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+                $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+                $permitidas = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
+                $info = @getimagesize($archivo['tmp_name']);
+                if (!isset($permitidas[$ext]) || $info === false || $archivo['size'] > 5 * 1024 * 1024) {
+                    flash_error("El titulo se guardo, pero la nueva foto no es valida.");
+                } else {
+                    $carpeta = __DIR__ . "/images/galeria/";
+                    if (!is_dir($carpeta)) mkdir($carpeta, 0755, true);
+                    $nombre = bin2hex(random_bytes(16)) . "." . $ext;
+                    if (move_uploaded_file($archivo['tmp_name'], $carpeta . $nombre)) {
+                        $stmt = $conexion->prepare("SELECT archivo FROM galeria WHERE id_foto = ?");
+                        $stmt->bind_param("i", $id);
+                        $stmt->execute();
+                        $vieja = $stmt->get_result()->fetch_assoc();
+                        $stmt->close();
+                        if ($vieja) {
+                            $ruta = $carpeta . basename($vieja['archivo']);
+                            if (is_file($ruta)) @unlink($ruta);
+                        }
+                        $stmt = $conexion->prepare("UPDATE galeria SET archivo = ? WHERE id_foto = ?");
+                        $stmt->bind_param("si", $nombre, $id);
+                        $stmt->execute();
+                        $stmt->close();
+                        flash_ok("Foto de la galeria actualizada.");
+                    }
+                }
+            } else {
+                flash_ok("Titulo de la foto actualizado.");
+            }
+        }
+    }
+
     if ($accion === 'eliminar_galeria') {
         $id = intval($_POST['id'] ?? 0);
         $stmt = $conexion->prepare("SELECT archivo FROM galeria WHERE id_foto = ?");

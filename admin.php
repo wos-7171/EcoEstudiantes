@@ -195,6 +195,13 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                 <td><?php echo htmlspecialchars($g['titulo']); ?></td>
                 <td><?php echo date("d/m/Y", strtotime($g['fecha_subida'])); ?></td>
                 <td>
+                    <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="accion" value="editar_galeria">
+                        <input type="hidden" name="id" value="<?php echo (int)$g['id_foto']; ?>">
+                        <input type="text" name="titulo" value="<?php echo htmlspecialchars($g['titulo']); ?>" maxlength="120" required>
+                        <input type="file" name="foto" accept="image/jpeg,image/png,image/webp,image/gif">
+                        <button type="submit" class="link link-edit">Guardar</button>
+                    </form>
                     <form action="admin_acciones.php" method="POST" onsubmit="return confirm('¿Quitar esta foto de la galeria?');">
                         <input type="hidden" name="accion" value="eliminar_galeria">
                         <input type="hidden" name="id" value="<?php echo (int)$g['id_foto']; ?>">
