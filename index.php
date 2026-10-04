@@ -88,9 +88,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="regRol">Soy...</label>
+                        <label for="regRol">Rol</label>
                         <input type="hidden" name="rol" value="3">
-                        <p style="font-size:0.9rem; color:#555;">La cuenta nueva queda como estudiante. El docente lo crea el administrador.</p>
+                        <input id="regRol" type="text" value="Estudiante" readonly>
                     </div>
 
                     <div class="form-group">
