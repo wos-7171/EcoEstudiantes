@@ -24,6 +24,7 @@ try {
         $nombre = trim($_POST['nombre'] ?? '');
         $descripcion = trim($_POST['descripcion'] ?? '');
         $objetivo = trim($_POST['objetivo'] ?? '');
+        $pei = trim($_POST['articulacion_pei'] ?? '');
         $fecha_inicio = fecha_permitida($_POST['fecha_inicio'] ?? '');
         $fecha_fin = fecha_permitida($_POST['fecha_fin'] ?? '');
         $id_institucion = 1; // unica institucion registrada por ahora
@@ -40,10 +41,10 @@ try {
             $inicio_sql = $fecha_inicio ?? '';
             $fin_sql = $fecha_fin ?? '';
             $stmt = $conexion->prepare(
-                "INSERT INTO proyectos_prae (id_institucion, id_responsable, nombre, descripcion, objetivo, fecha_inicio, fecha_fin)
-                 VALUES (?, ?, ?, ?, ?, NULLIF(?, ''), NULLIF(?, ''))"
+                "INSERT INTO proyectos_prae (id_institucion, id_responsable, nombre, descripcion, objetivo, articulacion_pei, fecha_inicio, fecha_fin)
+                 VALUES (?, ?, ?, ?, ?, ?, NULLIF(?, ''), NULLIF(?, ''))"
             );
-            $stmt->bind_param("iisssss", $id_institucion, $id_usuario, $nombre, $descripcion, $objetivo, $inicio_sql, $fin_sql);
+            $stmt->bind_param("iissssss", $id_institucion, $id_usuario, $nombre, $descripcion, $objetivo, $pei, $inicio_sql, $fin_sql);
             $stmt->execute();
             $stmt->close();
             flash_ok("Proyecto creado.");
@@ -62,6 +63,7 @@ try {
             $nombre = trim($_POST['nombre'] ?? '');
             $descripcion = trim($_POST['descripcion'] ?? '');
             $objetivo = trim($_POST['objetivo'] ?? '');
+            $pei = trim($_POST['articulacion_pei'] ?? '');
             $fecha_inicio = fecha_permitida($_POST['fecha_inicio'] ?? '');
             $fecha_fin = fecha_permitida($_POST['fecha_fin'] ?? '');
 
@@ -77,10 +79,10 @@ try {
                 $inicio_sql = $fecha_inicio ?? '';
                 $fin_sql = $fecha_fin ?? '';
                 $stmt = $conexion->prepare(
-                    "UPDATE proyectos_prae SET nombre = ?, descripcion = ?, objetivo = ?, fecha_inicio = NULLIF(?, ''), fecha_fin = NULLIF(?, '')
+                    "UPDATE proyectos_prae SET nombre = ?, descripcion = ?, objetivo = ?, articulacion_pei = ?, fecha_inicio = NULLIF(?, ''), fecha_fin = NULLIF(?, '')
                      WHERE id_proyecto = ?"
                 );
-                $stmt->bind_param("sssssi", $nombre, $descripcion, $objetivo, $inicio_sql, $fin_sql, $id);
+                $stmt->bind_param("ssssssi", $nombre, $descripcion, $objetivo, $pei, $inicio_sql, $fin_sql, $id);
                 $stmt->execute();
                 $stmt->close();
                 flash_ok("Proyecto actualizado.");

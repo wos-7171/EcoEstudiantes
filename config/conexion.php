@@ -78,4 +78,12 @@ if ($tabla_msg && $tabla_msg->num_rows > 0) {
          WHERE m.id_usuario IS NULL"
     );
 }
+
+$tabla_proy = $conexion->query("SHOW TABLES LIKE 'proyectos_prae'");
+if ($tabla_proy && $tabla_proy->num_rows > 0) {
+    $col_pei = $conexion->query("SHOW COLUMNS FROM proyectos_prae LIKE 'articulacion_pei'");
+    if ($col_pei && $col_pei->num_rows === 0) {
+        $conexion->query("ALTER TABLE proyectos_prae ADD COLUMN articulacion_pei VARCHAR(80) NULL");
+    }
+}
 ?>

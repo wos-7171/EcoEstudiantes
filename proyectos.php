@@ -13,7 +13,7 @@ $puede_crear = ($rol === 'Administrador' || $rol === 'Docente');
 
 // Listado de proyectos: Administrador ve todos, Docente ve todos también (para
 // poder coordinarse), Estudiante ve todos en modo solo lectura.
-$sql = "SELECT p.id_proyecto, p.nombre, p.descripcion, p.objetivo, p.estado,
+$sql = "SELECT p.id_proyecto, p.nombre, p.descripcion, p.objetivo, p.estado, p.articulacion_pei,
                p.fecha_inicio, p.fecha_fin, p.id_responsable,
                u.nombre AS resp_nombre, u.apellido AS resp_apellido,
                (SELECT COUNT(*) FROM actividades a WHERE a.id_proyecto = p.id_proyecto) AS num_actividades
@@ -47,6 +47,14 @@ $res_proyectos = $conexion->query($sql);
         <input type="text" name="nombre" placeholder="Nombre del proyecto" maxlength="150" required>
         <textarea name="descripcion" placeholder="Descripción" rows="3"></textarea>
         <textarea name="objetivo" placeholder="Objetivo del proyecto" rows="2"></textarea>
+        <label style="font-size:0.85rem; color:#555;">Articulacion con el PEI</label>
+        <select name="articulacion_pei" required>
+            <option value="">Selecciona el componente</option>
+            <option value="Gestion academica">Gestion academica</option>
+            <option value="Gestion de comunidad">Gestion de comunidad</option>
+            <option value="Gestion administrativa">Gestion administrativa</option>
+            <option value="Proyecto transversal">Proyecto transversal</option>
+        </select>
         <label style="font-size:0.85rem; color:#555;">Fecha de inicio (ano entre <?php echo FECHA_ANIO_MINIMO; ?> y <?php echo fecha_anio_maximo(); ?>)</label>
         <input type="date" name="fecha_inicio" min="<?php echo FECHA_ANIO_MINIMO; ?>-01-01" max="<?php echo fecha_anio_maximo(); ?>-12-31">
         <label style="font-size:0.85rem; color:#555;">Fecha de fin (estimada)</label>
@@ -87,6 +95,7 @@ $res_proyectos = $conexion->query($sql);
             <h3><?php echo htmlspecialchars($p['nombre']); ?></h3>
             <span class="estado-badge <?php echo $clase_estado; ?>"><?php echo htmlspecialchars($p['estado']); ?></span>
             <p class="meta">Responsable: <?php echo htmlspecialchars(trim(($p['resp_nombre'] ?? '(sin responsable)') . ' ' . ($p['resp_apellido'] ?? ''))); ?></p>
+            <p class="meta">PEI: <?php echo htmlspecialchars($p['articulacion_pei'] ?: 'Sin articular'); ?></p>
             <p class="meta">Actividades: <?php echo $p['num_actividades']; ?></p>
             <?php if ($p['fecha_inicio']): ?>
                 <p class="meta"><?php echo date("d/m/Y", strtotime($p['fecha_inicio'])); ?>

@@ -42,6 +42,18 @@ if (!$p) {
         <textarea name="descripcion" rows="3"><?php echo htmlspecialchars($p['descripcion'] ?? ''); ?></textarea>
         <label style="font-size:0.85rem; color:#555;">Objetivo</label>
         <textarea name="objetivo" rows="2"><?php echo htmlspecialchars($p['objetivo'] ?? ''); ?></textarea>
+        <label style="font-size:0.85rem; color:#555;">Articulacion con el PEI</label>
+        <select name="articulacion_pei" required>
+            <?php
+            $opciones = ['Gestion academica', 'Gestion de comunidad', 'Gestion administrativa', 'Proyecto transversal'];
+            $actual = $p['articulacion_pei'] ?? '';
+            echo '<option value="">Selecciona el componente</option>';
+            foreach ($opciones as $op) {
+                $sel = $actual === $op ? ' selected' : '';
+                echo '<option value="' . htmlspecialchars($op) . '"' . $sel . '>' . htmlspecialchars($op) . '</option>';
+            }
+            ?>
+        </select>
         <label style="font-size:0.85rem; color:#555;">Fecha de inicio (ano entre <?php echo FECHA_ANIO_MINIMO; ?> y <?php echo fecha_anio_maximo(); ?>)</label>
         <input type="date" name="fecha_inicio" min="<?php echo FECHA_ANIO_MINIMO; ?>-01-01" max="<?php echo fecha_anio_maximo(); ?>-12-31" value="<?php echo htmlspecialchars($p['fecha_inicio'] ?? ''); ?>">
         <label style="font-size:0.85rem; color:#555;">Fecha de fin (estimada)</label>
