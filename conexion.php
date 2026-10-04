@@ -40,4 +40,19 @@ if ($tabla_part && $tabla_part->num_rows > 0) {
            AND (a.puntos IS NULL OR a.puntos = 0)"
     );
 }
+
+// Imagenes de noticias: hasta 3 por publicacion. No borra noticias existentes.
+$tabla_not = $conexion->query("SHOW TABLES LIKE 'noticias'");
+if ($tabla_not && $tabla_not->num_rows > 0) {
+    $conexion->query(
+        "CREATE TABLE IF NOT EXISTS noticias_imagenes (
+            id_imagen INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            id_noticia INT UNSIGNED NOT NULL,
+            archivo VARCHAR(255) NOT NULL,
+            orden TINYINT UNSIGNED NOT NULL DEFAULT 1,
+            fecha_subida DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_ni_not FOREIGN KEY (id_noticia) REFERENCES noticias(id_noticia) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    );
+}
 ?>
