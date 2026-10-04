@@ -83,6 +83,7 @@ $rol = trim((string)$rol);
             <?php if ($rol === 'Administrador'): ?>
                 <li><a href="<?php echo htmlspecialchars($prefix); ?>admin.php">Panel Admin</a></li>
                 <li><a href="<?php echo htmlspecialchars($prefix); ?>instituciones.php">Instituciones</a></li>
+                <li><a href="<?php echo htmlspecialchars($prefix); ?>mensajes.php">Mensajes</a></li>
             <?php endif; ?>
             <?php if ($rol === 'Administrador' || $rol === 'Docente'): ?>
                 <li><a href="<?php echo htmlspecialchars($prefix); ?>reportes.php">Reportes</a></li>
@@ -91,6 +92,7 @@ $rol = trim((string)$rol);
                 <li><a href="<?php echo htmlspecialchars($prefix); ?>mis_actividades.php">Mis Actividades</a></li>
             <?php endif; ?>
             <li><a href="<?php echo htmlspecialchars($prefix); ?>perfil.php">Mi Perfil</a></li>
+            <li><a href="<?php echo htmlspecialchars($prefix); ?>mis_mensajes.php">Mis mensajes</a></li>
             <li><a href="<?php echo htmlspecialchars($prefix); ?>pages/recursos.php">Recursos y Normativa</a></li>
             <li><a href="<?php echo htmlspecialchars($prefix); ?>pages/quienes-somos.php">Quiénes Somos</a></li>
             <li><a href="<?php echo htmlspecialchars($prefix); ?>pages/antecedentes.php">Antecedentes</a></li>
