@@ -102,25 +102,4 @@ $col_archivo = $conexion->query("SHOW COLUMNS FROM galeria LIKE 'archivo'");
 if ($col_archivo && ($info = $col_archivo->fetch_assoc()) && strpos($info['Type'], '255') !== false) {
     $conexion->query("ALTER TABLE galeria MODIFY archivo VARCHAR(500) NOT NULL");
 }
-$fotos_base = [
-    ['Estudiantes sembrando un arbol', 'https://www.el19digital.com/files/articulos/251016.jpeg'],
-    ['Escuela con paneles solares', 'https://colaborativo.net/wp-content/uploads/2018/07/energia-solar.png'],
-    ['Laptop con graficos ambientales', 'https://img.freepik.com/fotos-premium/laptop-grafico_253658-3741.jpg'],
-    ['Reciclaje en la escuela', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbRe-EOvSrxtvN98TK44BTrcP7eGH1YPHZLA&s'],
-    ['Rio limpio con peces', 'https://chilebio.cl/wp-content/uploads/2021/08/peces1.jpg'],
-    ['Huerta escolar comunitaria', 'https://bogota.gov.co/sites/default/files/styles/1050px/public/h1.jpg'],
-];
-$stmt_existe = $conexion->prepare("SELECT id_foto FROM galeria WHERE archivo = ?");
-$stmt_inserta = $conexion->prepare("INSERT INTO galeria (titulo, archivo) VALUES (?, ?)");
-foreach ($fotos_base as $foto) {
-    $stmt_existe->bind_param("s", $foto[1]);
-    $stmt_existe->execute();
-    $ya = $stmt_existe->get_result()->fetch_assoc();
-    if (!$ya) {
-        $stmt_inserta->bind_param("ss", $foto[0], $foto[1]);
-        $stmt_inserta->execute();
-    }
-}
-$stmt_existe->close();
-$stmt_inserta->close();
 ?>
