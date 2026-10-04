@@ -102,9 +102,12 @@ function formato_nota($nota) {
 
 // ---------- Archivos de evidencia ----------
 function borrar_archivo_evidencia($archivo) {
-    $ruta = dirname(__DIR__) . "/evidencias/" . basename((string)$archivo);
-    if (is_file($ruta)) {
-        @unlink($ruta);
+    $nombre = basename((string)$archivo);
+    foreach (["/uploads/evidencias/", "/evidencias/"] as $carpeta) {
+        $ruta = dirname(__DIR__) . $carpeta . $nombre;
+        if (is_file($ruta)) {
+            @unlink($ruta);
+        }
     }
 }
 

@@ -129,7 +129,7 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
     <?php else: ?>
     <div class="evid-grid">
         <?php while ($e = $evidencias->fetch_assoc()):
-            $url = "evidencias/" . rawurlencode($e['archivo']);
+            $url = "uploads/evidencias/" . rawurlencode($e['archivo']);
         ?>
         <div class="evid">
             <?php if ($e['tipo'] === 'Imagen'): ?>

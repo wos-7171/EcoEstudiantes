@@ -21,7 +21,7 @@ $id_actividad = intval($_POST['id_actividad'] ?? 0);
 $volver = "subir_evidencia.php?id_actividad=" . $id_actividad;
 
 // Carpeta fisica de evidencias (se crea sola si no existe, ya protegida)
-$carpeta = __DIR__ . "/evidencias/";
+$carpeta = __DIR__ . "/uploads/evidencias/";
 if (!is_dir($carpeta)) {
     mkdir($carpeta, 0755, true);
 }
@@ -117,7 +117,7 @@ if ($accion === 'subir') {
     // Nombre aleatorio y unico: nunca se usa el nombre original
     $nombre_guardado = bin2hex(random_bytes(16)) . "." . $ext;
     if (!move_uploaded_file($archivo['tmp_name'], $carpeta . $nombre_guardado)) {
-        $_SESSION['flash_error'] = "No se pudo guardar el archivo en el servidor. Revisa los permisos de la carpeta evidencias/.";
+        $_SESSION['flash_error'] = "No se pudo guardar el archivo en el servidor. Revisa los permisos de la carpeta uploads/evidencias/.";
         header("Location: " . $volver);
         exit();
     }

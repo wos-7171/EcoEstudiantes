@@ -122,7 +122,7 @@ unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
             <p class="meta">Este estudiante todavia no ha subido evidencias.</p>
         <?php else: ?>
         <div class="evid-grid">
-            <?php foreach ($evs as $e): $url = "evidencias/" . rawurlencode($e['archivo']); ?>
+            <?php foreach ($evs as $e): $url = "uploads/evidencias/" . rawurlencode($e['archivo']); ?>
             <div class="evid">
                 <?php if ($e['tipo'] === 'Imagen'): ?>
                     <a href="<?php echo $url; ?>" target="_blank"><img src="<?php echo $url; ?>" alt="Evidencia"></a>

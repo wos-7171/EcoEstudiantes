@@ -1,0 +1,15 @@
+# Carpeta de evidencias subidas por estudiantes.
+# Bloquea la ejecucion de cualquier script y el listado de archivos.
+Options -Indexes -ExecCGI
+<FilesMatch "\.(php|php[0-9]|phtml|phar|pl|py|cgi|sh|exe|html?|js|svg)$">
+    Require all denied
+</FilesMatch>
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
