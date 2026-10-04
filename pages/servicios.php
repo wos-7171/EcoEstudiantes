@@ -40,9 +40,9 @@ $prefix = "../";
                             <h4>Características principales:</h4>
                             <ul class="custom-list">
                                 <li>Registro de actividades ambientales</li>
-                                <li>Seguimiento de proyectos en tiempo real</li>
-                                <li>Comunicación entre docentes y estudiantes</li>
-                                <li>Almacenamiento seguro de datos</li>
+                                <li>Seguimiento del estado del proyecto al consultar la pagina</li>
+                                <li>Mensajes de contacto con respuesta del administrador</li>
+                                <li>Almacenamiento de proyectos, notas y evidencias</li>
                             </ul>
                         </div>
                     </div>
@@ -62,17 +62,16 @@ $prefix = "../";
                    
                         <div class="service-card">
                             <h3>2. Módulo de Reportes Interactivos</h3>
-                            <p>Genera <span class="highlight">informes</span> gráficos y estadísticas para medir el
-                                <span class="highlight">impacto ambiental</span> de los proyectos ambientales escolares.
+                            <p>Genera <span class="highlight">informes</span> graficos para ver el avance, la participacion y el promedio de los proyectos ambientales escolares.
                             </p>
                         
                         <div class="service-features">
                             <h4>Características principales:</h4>
                             <ul class="custom-list">
-                                <li>Generación automática de reportes</li>
-                                <li>Gráficos interactivos y personalizables</li>
-                                <li>Indicadores de impacto ambiental</li>
-                                <li>Exportación de datos en múltiples formatos</li>
+                                <li>Reportes de proyectos, actividades y promedios</li>
+                                <li>Graficos de estado, participacion y evolucion</li>
+                                <li>Promedio de notas de 1.0 a 5.0</li>
+                                <li>Consulta segun el rol del usuario</li>
                             </ul>
                         </div>
                     </div>
