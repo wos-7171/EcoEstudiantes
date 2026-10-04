@@ -148,7 +148,10 @@ foreach ($evolucion as $fila) {
     $mapa_fin[$fila['mes']] = (int)$fila['finalizadas'];
 }
 $nombres_mes = [1 => 'ene', 2 => 'feb', 3 => 'mar', 4 => 'abr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'ago', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dic'];
-$inicio = $mapa_tot ? min(array_keys($mapa_tot)) : date('Y-m');
+$inicio = date('Y-m', strtotime('-5 months'));
+if ($mapa_tot && min(array_keys($mapa_tot)) < $inicio) {
+    $inicio = min(array_keys($mapa_tot));
+}
 $fin = max($mapa_tot ? max(array_keys($mapa_tot)) : date('Y-m'), date('Y-m'));
 $cursor = DateTime::createFromFormat('Y-m-d', $inicio . '-01');
 $limite = DateTime::createFromFormat('Y-m-d', $fin . '-01');

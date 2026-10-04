@@ -19,11 +19,8 @@ $correo = trim($_POST["correo"] ?? '');
 $contrasena = $_POST["contrasena"] ?? '';
 $contrasena_conf = $_POST["contrasena_conf"] ?? $contrasena;
 
-// Todo autorregistro publico solo puede ser Estudiante (3) o Docente (2).
-// NUNCA se acepta "Administrador" desde este formulario, aunque alguien
-// manipule el HTML e intente mandar otro valor por POST.
-$rol_enviado = isset($_POST["rol"]) ? intval($_POST["rol"]) : 3;
-$id_rol = in_array($rol_enviado, [2, 3], true) ? $rol_enviado : 3;
+// El autorregistro solo crea estudiantes. El docente lo crea el administrador.
+$id_rol = 3;
 $id_institucion = 1;
 
 // Validaciones del lado del servidor (no se confia solo en el JavaScript)

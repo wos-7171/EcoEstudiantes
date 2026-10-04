@@ -89,10 +89,8 @@
 
                     <div class="form-group">
                         <label for="regRol">Soy...</label>
-                        <select id="regRol" name="rol" required style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid #ccc;">
-                            <option value="3">Estudiante</option>
-                            <option value="2">Docente</option>
-                        </select>
+                        <input type="hidden" name="rol" value="3">
+                        <p style="font-size:0.9rem; color:#555;">La cuenta nueva queda como estudiante. El docente lo crea el administrador.</p>
                     </div>
 
                     <div class="form-group">
