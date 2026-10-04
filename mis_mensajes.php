@@ -26,9 +26,9 @@ $res = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis mensajes - EcoEstudiantes</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/app.css">
-    <link rel="stylesheet" href="css/motion.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/motion.css">
 </head>
 <body>
 <?php include("incluir_nav.php"); ?>
@@ -36,6 +36,7 @@ $res = $stmt->get_result();
     <div class="breadcrumb"><a href="pages/contacto.php">Enviar otro mensaje</a></div>
     <h1>Mis mensajes</h1>
     <p>Aqui ves lo que enviaste por contacto y la respuesta del administrador.</p>
+
     <?php if ($res->num_rows === 0): ?>
         <p class="vacio">Todavia no has enviado mensajes. Puedes escribir uno en Contacto.</p>
     <?php else: while ($m = $res->fetch_assoc()): ?>

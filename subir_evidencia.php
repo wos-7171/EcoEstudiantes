@@ -80,8 +80,8 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subir evidencia - <?php echo htmlspecialchars($actividad['nombre']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
 <?php include("incluir_nav.php"); ?>

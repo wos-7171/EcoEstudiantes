@@ -1,0 +1,73 @@
+/* Movimiento sutil. No cambia colores ni estructura. */
+html { scroll-behavior: smooth; }
+
+body {
+    animation: ee-entrada 0.35s ease both;
+}
+
+@keyframes ee-entrada {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+
+a, button, .btn, .logout-btn, .tab-btn, input, select, textarea {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+}
+
+button:hover, .btn:hover, .logout-btn:hover, .tab-btn:hover {
+    transform: translateY(-1px);
+}
+
+button:active, .btn:active, .logout-btn:active, .tab-btn:active, a:active {
+    transform: translateY(0) scale(0.98);
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid #f6c85f;
+    outline-offset: 2px;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #2f9e44;
+    box-shadow: 0 0 0 3px rgba(47, 158, 68, 0.15);
+}
+
+.main-nav a.activo, .sticky-nav a.activo {
+    background: #2f9e44;
+    color: #fff;
+    border-color: #2f9e44;
+}
+
+.card, .section, .login-card, .chart-box, form {
+    animation: ee-bloque 0.4s ease both;
+}
+
+@keyframes ee-bloque {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}
+
+.ee-visible {
+    animation: ee-bloque 0.45s ease both;
+}
+
+.error-msg, .aviso, .alert {
+    animation: ee-entrada 0.25s ease both;
+}
+
+#panelLogin, #panelRegistro {
+    animation: ee-panel 0.28s ease both;
+}
+
+@keyframes ee-panel {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}

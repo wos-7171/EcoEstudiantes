@@ -72,8 +72,8 @@ if ($rol === 'Estudiante') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actividades - <?php echo htmlspecialchars($proyecto['nombre']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/app.css">
     <style>
         .app-section { max-width: 1100px; margin: 30px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h1 { color: #2e7d32; margin-bottom: 4px; }

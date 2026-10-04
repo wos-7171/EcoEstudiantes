@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión / Registro</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/motion.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/motion.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 </head>
 
@@ -15,11 +15,15 @@
     <div class="login-container">
         <div class="login-card">
 
+            <!-- Pestañas para alternar entre Login y Registro -->
             <div class="tab-switcher">
                 <button class="tab-btn active" id="tabLogin" onclick="mostrarTab('login')">Iniciar Sesión</button>
                 <button class="tab-btn" id="tabRegister" onclick="mostrarTab('registro')">Registrarse</button>
             </div>
 
+            <!-- ══════════════════════════════
+           FORMULARIO DE INICIO DE SESIÓN
+      ══════════════════════════════ -->
             <div id="panelLogin">
                 <div class="login-header">
                     <h1>Bienvenido</h1>
@@ -49,11 +53,14 @@
 
                     <p class="switch-hint">
                         ¿No tienes cuenta?
-                        <a href="#" onclick="mostrarTab('registro'); return false;">Regístrate aquí</a>
+                        <a href="#" onclick="mostrarTab('registro')">Regístrate aquí</a>
                     </p>
                 </form>
             </div>
 
+            <!-- ══════════════════════════════
+           FORMULARIO DE REGISTRO
+      ══════════════════════════════ -->
             <div id="panelRegistro" style="display:none;">
                 <div class="login-header">
                     <h1>Crear cuenta</h1>
@@ -94,6 +101,7 @@
                             <input type="password" id="regPassword" name="contrasena" placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número" required>
                             <button type="button" id="toggleRegPass">Mostrar</button>
                         </div>
+                        <!-- Medidor de fortaleza -->
                         <div id="fortaleza">
                             <div id="barraFuerza"></div>
                         </div>
@@ -116,7 +124,7 @@
 
                     <p class="switch-hint">
                         ¿Ya tienes cuenta?
-                        <a href="#" onclick="mostrarTab('login'); return false;">Inicia sesión</a>
+                        <a href="#" onclick="mostrarTab('login')">Inicia sesión</a>
                     </p>
                 </form>
             </div>
@@ -125,8 +133,8 @@
 
     </div>
 
-    <script src="script.js"></script>
-    <script src="js/motion.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/motion.js"></script>
 </body>
 
 </html>

@@ -3,19 +3,23 @@ session_start();
 include("conexion.php");
 include("funciones.php");
 
+// Verificar sesión y rol de administrador
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
     header("Location: index.php");
     exit();
 }
 
+// Usuarios + nombre de su rol
 $res_usuarios = $conexion->query(
     "SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.id_rol, r.nombre AS rol, u.estado
      FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
      ORDER BY u.id_usuario DESC"
 );
 
+// Roles disponibles (para el <select> de creación)
 $res_roles = $conexion->query("SELECT id_rol, nombre FROM roles ORDER BY id_rol");
 
+// Noticias + autor + cantidad de imagenes
 $res_noticias = $conexion->query(
     "SELECT n.id_noticia, n.titulo, n.fecha_publicacion, u.nombre AS autor,
             (SELECT COUNT(*) FROM noticias_imagenes ni WHERE ni.id_noticia = n.id_noticia) AS num_imagenes
@@ -23,6 +27,7 @@ $res_noticias = $conexion->query(
      ORDER BY n.fecha_publicacion DESC"
 );
 
+// Proyectos PRAE (resumen)
 $res_proyectos = $conexion->query(
     "SELECT p.id_proyecto, p.nombre, p.estado, u.nombre AS responsable,
             (SELECT COUNT(*) FROM actividades a WHERE a.id_proyecto = p.id_proyecto) AS num_actividades
@@ -30,11 +35,13 @@ $res_proyectos = $conexion->query(
      ORDER BY p.fecha_creacion DESC"
 );
 
+// Mensajes de contacto pendientes
 $res_mensajes = $conexion->query(
     "SELECT id_mensaje, nombre, correo, asunto, fecha_envio, estado
      FROM mensajes_contacto ORDER BY fecha_envio DESC LIMIT 10"
 );
 
+// Instituciones (para el resumen)
 $res_instituciones = $conexion->query("SELECT COUNT(*) AS n FROM instituciones");
 $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
 ?>
@@ -43,7 +50,8 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
 <head>
     <meta charset="UTF-8">
     <title>Panel de Administración - EcoEstudiantes</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/motion.css">
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f8; }
         .container { max-width: 1100px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -80,8 +88,9 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 16px 0; }
         .kpi { background: #e8f5e9; border-radius: 8px; padding: 12px; text-align: center; }
         .kpi .num { display: block; font-size: 1.6rem; font-weight: 700; color: #1b5e20; }
-        .kpi .lbl { font-size: 0.78rem; color: #555; }
         .ayuda { margin: 0 0 8px; color: #666; font-size: 0.85rem; }
+        .minis { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .minis img { width: 54px; height: 40px; object-fit: contain; background: #f3f3f3; border: 1px solid #e0e0e0; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -109,6 +118,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         <div class="kpi"><span class="num"><?php echo $res_noticias->num_rows; ?></span><span class="lbl">Noticias</span></div>
     </div>
 
+    <!-- SECCIÓN USUARIOS -->
     <h2>Gestión de Usuarios</h2>
 
     <h3>Crear Nuevo Usuario</h3>
@@ -162,6 +172,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 
+    <!-- SECCIÓN NOTICIAS -->
     <h2>Gestión de Noticias y Contenido</h2>
 
     <h3>Publicar Nueva Noticia</h3>
@@ -210,6 +221,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 
+    <!-- SECCIÓN PROYECTOS PRAE -->
     <h2>Proyectos PRAE (resumen)</h2>
     <table>
         <thead>
@@ -230,6 +242,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 
+    <!-- SECCIÓN MENSAJES DE CONTACTO -->
     <h2>Últimos Mensajes de Contacto <a class="btn-link" href="mensajes.php" style="font-size:0.9rem;">Ver todos</a></h2>
     <table>
         <thead>
@@ -255,6 +268,6 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 </div>
-
+<script src="assets/js/motion.js"></script>
 </body>
 </html>
