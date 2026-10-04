@@ -124,12 +124,15 @@ $g_rank_lbl = array_map(fn($r) => $r['nombre'] . ' ' . $r['apellido'], $ranking)
 $g_rank_val = array_map(fn($r) => (float)$r['promedio'], $ranking);
 
 // ---------- 5. Evolucion de actividades en el tiempo (por mes) ----------
+// No incluye fechas imposibles (por ejemplo el ano 4444): deforman el eje.
+$anio_max = fecha_anio_maximo();
 $evolucion = consultar($conexion,
     "SELECT DATE_FORMAT(COALESCE(a.fecha_actividad, DATE(a.fecha_creacion)), '%Y-%m') AS mes,
             COUNT(*) AS actividades,
             COALESCE(SUM(a.estado = 'Finalizada'), 0) AS finalizadas
      FROM actividades a INNER JOIN proyectos_prae p ON p.id_proyecto = a.id_proyecto
      WHERE $filtro
+       AND YEAR(COALESCE(a.fecha_actividad, DATE(a.fecha_creacion))) BETWEEN 2015 AND $anio_max
      GROUP BY mes ORDER BY mes",
     $es_admin, $id_usuario);
 $g_evo_lbl = array_column($evolucion, 'mes');
@@ -204,6 +207,7 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
         </div>
         <div class="chart-box" style="grid-column: 1 / -1;">
             <h3>Evolucion de actividades en el tiempo</h3>
+            <p class="meta">Cada punto es un mes. La linea azul cuenta actividades de ese mes y la verde las que ya estan finalizadas. Una fecha fuera de 2015 a <?php echo fecha_anio_maximo(); ?> no entra en esta grafica.</p>
             <div class="chart-wrap"><canvas id="gEvolucion"></canvas></div>
         </div>
     </div>
