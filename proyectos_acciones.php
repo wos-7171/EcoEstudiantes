@@ -115,6 +115,15 @@ try {
             $stmt->bind_param("si", $estado, $id);
             $stmt->execute();
             $stmt->close();
+            if ($estado === 'Finalizado') {
+                $stmt = $conexion->prepare(
+                    "UPDATE actividades SET estado = 'Finalizada'
+                     WHERE id_proyecto = ? AND estado <> 'Cancelada'"
+                );
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
         } else {
             flash_error("No tienes permiso para cambiar el estado de este proyecto.");
         }
