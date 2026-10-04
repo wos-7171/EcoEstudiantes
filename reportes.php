@@ -136,6 +136,11 @@ $g_evo_lbl = array_column($evolucion, 'mes');
 $g_evo_tot = array_map('intval', array_column($evolucion, 'actividades'));
 $g_evo_fin = array_map('intval', array_column($evolucion, 'finalizadas'));
 
+$impactos = consultar($conexion,
+    "SELECT COALESCE(p.impacto, 'Sin registrar') AS impacto, COUNT(*) AS total
+     FROM proyectos_prae p WHERE $filtro GROUP BY impacto",
+    $es_admin, $id_usuario);
+
 $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
 ?>
 <!DOCTYPE html>
@@ -201,6 +206,16 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
             <h3>Evolucion de actividades en el tiempo</h3>
             <div class="chart-wrap"><canvas id="gEvolucion"></canvas></div>
         </div>
+    </div>
+
+    <h2>Impacto ambiental de los proyectos</h2>
+    <div class="kpis">
+        <?php foreach (['Alto', 'Medio', 'Bajo', 'Sin registrar'] as $nivel):
+            $n = 0;
+            foreach ($impactos as $fila) { if ($fila['impacto'] === $nivel) $n = (int)$fila['total']; }
+        ?>
+        <div class="kpi"><span class="num"><?php echo $n; ?></span><span class="lbl"><?php echo $nivel; ?></span></div>
+        <?php endforeach; ?>
     </div>
 
     <h2>Top de estudiantes</h2>

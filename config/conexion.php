@@ -85,5 +85,9 @@ if ($tabla_proy && $tabla_proy->num_rows > 0) {
     if ($col_pei && $col_pei->num_rows === 0) {
         $conexion->query("ALTER TABLE proyectos_prae ADD COLUMN articulacion_pei VARCHAR(80) NULL");
     }
+    $col_impacto = $conexion->query("SHOW COLUMNS FROM proyectos_prae LIKE 'impacto'");
+    if ($col_impacto && $col_impacto->num_rows === 0) {
+        $conexion->query("ALTER TABLE proyectos_prae ADD COLUMN impacto VARCHAR(20) NULL");
+    }
 }
 ?>

@@ -54,6 +54,18 @@ if (!$p) {
             }
             ?>
         </select>
+        <label style="font-size:0.85rem; color:#555;">Impacto ambiental</label>
+        <select name="impacto" required>
+            <?php
+            $impactos = ['Bajo', 'Medio', 'Alto'];
+            $impacto_actual = $p['impacto'] ?? '';
+            echo '<option value="">Selecciona el impacto</option>';
+            foreach ($impactos as $op) {
+                $sel = $impacto_actual === $op ? ' selected' : '';
+                echo '<option value="' . htmlspecialchars($op) . '"' . $sel . '>' . htmlspecialchars($op) . '</option>';
+            }
+            ?>
+        </select>
         <label style="font-size:0.85rem; color:#555;">Fecha de inicio (ano entre <?php echo FECHA_ANIO_MINIMO; ?> y <?php echo fecha_anio_maximo(); ?>)</label>
         <input type="date" name="fecha_inicio" min="<?php echo FECHA_ANIO_MINIMO; ?>-01-01" max="<?php echo fecha_anio_maximo(); ?>-12-31" value="<?php echo htmlspecialchars($p['fecha_inicio'] ?? ''); ?>">
         <label style="font-size:0.85rem; color:#555;">Fecha de fin (estimada)</label>
