@@ -114,25 +114,6 @@ $res_proyectos = $conexion->query($sql);
         <?php endwhile; endif; ?>
     </div>
 </div>
-<script>
-// Filtro de proyectos por estado, sin recargar la página
-document.querySelectorAll('.filtros a[data-estado]').forEach(function (enlace) {
-    enlace.addEventListener('click', function (ev) {
-        ev.preventDefault();
-        var estado = enlace.getAttribute('data-estado');
-        document.querySelectorAll('.filtros a').forEach(function (a) { a.classList.remove('activo'); });
-        enlace.classList.add('activo');
-        document.querySelectorAll('#grid-proyectos .card-proyecto').forEach(function (tarjeta) {
-            tarjeta.style.display = (tarjeta.getAttribute('data-estado') === estado) ? '' : 'none';
-        });
-    });
-});
-document.getElementById('f-todos').addEventListener('click', function (ev) {
-    ev.preventDefault();
-    document.querySelectorAll('.filtros a').forEach(function (a) { a.classList.remove('activo'); });
-    document.getElementById('f-todos').classList.add('activo');
-    document.querySelectorAll('#grid-proyectos .card-proyecto').forEach(function (tarjeta) { tarjeta.style.display = ''; });
-});
-</script>
+<script src="assets/js/proyectos.js"></script>
 </body>
 </html>

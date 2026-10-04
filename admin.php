@@ -146,14 +146,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         <p class="ayuda">JPG, PNG, WEBP o GIF. Hasta 3 imagenes, de 5 MB cada una. Se muestran completas, sin estirarlas.</p>
         <button type="submit">Publicar Noticia</button>
     </form>
-    <script>
-    document.getElementById('imagenes').addEventListener('change', function () {
-        if (this.files.length > 3) {
-            alert('Solo se pueden anexar 3 imagenes. Elige de nuevo.');
-            this.value = '';
-        }
-    });
-    </script>
+<script src="assets/js/admin.js"></script>
 
     <h3>Noticias Publicadas</h3>
     <table>

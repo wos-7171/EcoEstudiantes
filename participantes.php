@@ -158,18 +158,6 @@ unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
     </div>
     <?php endwhile; endif; ?>
 </div>
-<script>
-// Si no participo o sigue inscrito, la nota queda vacia. Solo se exige al marcar Participo.
-function ajustarNota(sel) {
-    var campo = sel.form.querySelector('input[name="nota"]');
-    if (sel.value === 'Participó') {
-        campo.required = true;
-    } else {
-        campo.required = false;
-        campo.value = '';
-    }
-}
-</script>
+<script src="assets/js/participantes.js"></script>
 </body>
 </html>
-ml>
