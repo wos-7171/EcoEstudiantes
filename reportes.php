@@ -144,6 +144,23 @@ $evolucion = consultar($conexion,
 $g_evo_lbl = array_column($evolucion, 'mes');
 $g_evo_tot = array_map('intval', array_column($evolucion, 'actividades'));
 $g_evo_fin = array_map('intval', array_column($evolucion, 'finalizadas'));
+$mapa_tot = array_combine($g_evo_lbl, $g_evo_tot) ?: [];
+$mapa_fin = array_combine($g_evo_lbl, $g_evo_fin) ?: [];
+$inicio = $g_evo_lbl ? min($g_evo_lbl) : date('Y-m');
+$fin = max($g_evo_lbl ? max($g_evo_lbl) : date('Y-m'), date('Y-m'));
+$cursor = DateTime::createFromFormat('Y-m-d', $inicio . '-01');
+$cursor->modify('-2 months');
+$limite = DateTime::createFromFormat('Y-m-d', $fin . '-01');
+$g_evo_lbl = [];
+$g_evo_tot = [];
+$g_evo_fin = [];
+while ($cursor <= $limite) {
+    $mes = $cursor->format('Y-m');
+    $g_evo_lbl[] = $mes;
+    $g_evo_tot[] = $mapa_tot[$mes] ?? 0;
+    $g_evo_fin[] = $mapa_fin[$mes] ?? 0;
+    $cursor->modify('+1 month');
+}
 
 $impactos = consultar($conexion,
     "SELECT COALESCE(p.impacto, 'Sin registrar') AS impacto, COUNT(*) AS total
@@ -304,8 +321,8 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
         data: {
             labels: <?php echo json_encode($g_evo_lbl, $opts); ?>,
             datasets: [
-                { label: 'Actividades', data: <?php echo json_encode($g_evo_tot); ?>, borderColor: azul, backgroundColor: azul, tension: 0.25 },
-                { label: 'Finalizadas', data: <?php echo json_encode($g_evo_fin); ?>, borderColor: verde, backgroundColor: verde, tension: 0.25 }
+                { label: 'Actividades', data: <?php echo json_encode($g_evo_tot); ?>, borderColor: azul, backgroundColor: 'rgba(25,118,210,0.15)', tension: 0.25, borderWidth: 3, pointRadius: 5, fill: true },
+                { label: 'Finalizadas', data: <?php echo json_encode($g_evo_fin); ?>, borderColor: verde, backgroundColor: 'rgba(46,125,50,0.12)', tension: 0.25, borderWidth: 3, pointRadius: 5, fill: true }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: entero } }
