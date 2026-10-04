@@ -123,21 +123,37 @@ $ranking = consultar($conexion,
 $g_rank_lbl = array_map(fn($r) => $r['nombre'] . ' ' . $r['apellido'], $ranking);
 $g_rank_val = array_map(fn($r) => (float)$r['promedio'], $ranking);
 
-// ---------- 5. Evolucion de actividades en el tiempo (por mes) ----------
-// No incluye fechas imposibles (por ejemplo el ano 4444): deforman el eje.
+// ---------- 5. Evolucion de proyectos en el tiempo ----------
+// La azul cuenta proyectos por el mes en que inician. La verde cuenta los que
+// estan en estado Finalizado, por el mes de fin. Si la fecha esta fuera de
+// 2015 a ano actual + 10, se usa el mes actual para que el proyecto no desaparezca.
 $anio_max = fecha_anio_maximo();
-$evolucion = consultar($conexion,
-    "SELECT DATE_FORMAT(COALESCE(a.fecha_actividad, DATE(a.fecha_creacion)), '%Y-%m') AS mes,
-            COUNT(*) AS actividades,
-            COALESCE(SUM(a.estado = 'Finalizada'), 0) AS finalizadas
-     FROM actividades a INNER JOIN proyectos_prae p ON p.id_proyecto = a.id_proyecto
-     WHERE $filtro
-       AND YEAR(COALESCE(a.fecha_actividad, DATE(a.fecha_creacion))) BETWEEN 2015 AND $anio_max
-     GROUP BY mes ORDER BY mes",
+$filas_evo = consultar($conexion,
+    "SELECT p.estado, p.fecha_inicio, p.fecha_fin, DATE(p.fecha_creacion) AS fecha_creacion
+     FROM proyectos_prae p WHERE $filtro",
     $es_admin, $id_usuario);
-$g_evo_lbl = array_column($evolucion, 'mes');
-$g_evo_tot = array_map('intval', array_column($evolucion, 'actividades'));
-$g_evo_fin = array_map('intval', array_column($evolucion, 'finalizadas'));
+$mes_actual = date('Y-m');
+$mapa_inicio = [];
+$mapa_fin = [];
+$mes_de = function ($fecha) use ($anio_max, $mes_actual) {
+    if (!$fecha) return $mes_actual;
+    $anio = (int)substr($fecha, 0, 4);
+    if ($anio < 2015 || $anio > $anio_max) return $mes_actual;
+    return substr($fecha, 0, 7);
+};
+foreach ($filas_evo as $fila) {
+    $inicio = $mes_de($fila['fecha_inicio'] ?: $fila['fecha_creacion']);
+    $mapa_inicio[$inicio] = ($mapa_inicio[$inicio] ?? 0) + 1;
+    if ($fila['estado'] === 'Finalizado') {
+        $fin = $mes_de($fila['fecha_fin'] ?: ($fila['fecha_inicio'] ?: $fila['fecha_creacion']));
+        $mapa_fin[$fin] = ($mapa_fin[$fin] ?? 0) + 1;
+    }
+}
+$meses = array_unique(array_merge(array_keys($mapa_inicio), array_keys($mapa_fin)));
+sort($meses);
+$g_evo_lbl = $meses;
+$g_evo_tot = array_map(fn($m) => $mapa_inicio[$m] ?? 0, $meses);
+$g_evo_fin = array_map(fn($m) => $mapa_fin[$m] ?? 0, $meses);
 
 $impactos = consultar($conexion,
     "SELECT COALESCE(p.impacto, 'Sin registrar') AS impacto, COUNT(*) AS total
@@ -206,8 +222,8 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
             <div class="chart-wrap"><canvas id="gRanking"></canvas></div>
         </div>
         <div class="chart-box" style="grid-column: 1 / -1;">
-            <h3>Evolucion de actividades en el tiempo</h3>
-            <p class="meta">Cada punto es un mes. La linea azul cuenta actividades de ese mes y la verde las que ya estan finalizadas. Una fecha fuera de 2015 a <?php echo fecha_anio_maximo(); ?> no entra en esta grafica.</p>
+            <h3>Evolucion de proyectos en el tiempo</h3>
+            <p class="meta">La linea azul es un proyecto iniciado en ese mes. La verde es un proyecto que esta en estado Finalizado. Si la fecha esta mal escrita, ese proyecto se cuenta en el mes actual para que no desaparezca.</p>
             <div class="chart-wrap"><canvas id="gEvolucion"></canvas></div>
         </div>
     </div>
@@ -298,8 +314,8 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
         data: {
             labels: <?php echo json_encode($g_evo_lbl, $opts); ?>,
             datasets: [
-                { label: 'Actividades', data: <?php echo json_encode($g_evo_tot); ?>, borderColor: azul, backgroundColor: azul, tension: 0.25 },
-                { label: 'Finalizadas', data: <?php echo json_encode($g_evo_fin); ?>, borderColor: verde, backgroundColor: verde, tension: 0.25 }
+                { label: 'Proyectos iniciados', data: <?php echo json_encode($g_evo_tot); ?>, borderColor: azul, backgroundColor: azul, tension: 0.25 },
+                { label: 'Proyectos finalizados', data: <?php echo json_encode($g_evo_fin); ?>, borderColor: verde, backgroundColor: verde, tension: 0.25 }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: entero } }
