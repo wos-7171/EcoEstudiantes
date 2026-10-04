@@ -65,11 +65,11 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
     <?php flash_mostrar(); ?>
 
     <div class="nav-quick">
-        <a href="proyectos.php">Proyectos PRAE</a>
-        <a href="reportes.php">Reportes</a>
-        <a href="mensajes.php">Mensajes</a>
-        <a href="instituciones.php">Instituciones</a>
-        <a href="perfil.php">Mi perfil</a>
+        <a href="#usuarios">Usuarios</a>
+        <a href="#noticias">Noticias</a>
+        <a href="#galeria">Galeria</a>
+        <a href="#proyectos">Proyectos</a>
+        <a href="#mensajes">Mensajes</a>
         <a href="indexprincipal.php">Ver sitio</a>
     </div>
 
@@ -81,7 +81,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
     </div>
 
     <!-- SECCIÓN USUARIOS -->
-    <h2>Gestión de Usuarios</h2>
+    <h2 id="usuarios">Gestión de Usuarios</h2>
 
     <h3>Crear Nuevo Usuario</h3>
     <form action="admin_acciones.php" method="POST">
@@ -135,7 +135,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
     </table>
 
     <!-- SECCIÓN NOTICIAS -->
-    <h2>Gestión de Noticias y Contenido</h2>
+    <h2 id="noticias">Gestión de Noticias y Contenido</h2>
 
     <h3>Publicar Nueva Noticia</h3>
     <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
@@ -176,7 +176,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         </tbody>
     </table>
 
-    <h2>Galeria</h2>
+    <h2 id="galeria">Galeria</h2>
     <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="accion" value="subir_galeria">
         <input type="text" name="titulo" placeholder="Titulo de la foto" maxlength="120" required>
@@ -215,7 +215,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
     </table>
 
     <!-- SECCIÓN PROYECTOS PRAE -->
-    <h2>Proyectos PRAE (resumen)</h2>
+    <h2 id="proyectos">Proyectos PRAE (resumen)</h2>
     <table>
         <thead>
             <tr><th>ID</th><th>Nombre</th><th>Responsable</th><th>Estado</th><th># Actividades</th></tr>
@@ -236,7 +236,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
     </table>
 
     <!-- SECCIÓN MENSAJES DE CONTACTO -->
-    <h2>Últimos Mensajes de Contacto <a class="btn-link" href="mensajes.php" style="font-size:0.9rem;">Ver todos</a></h2>
+    <h2 id="mensajes">Últimos Mensajes de Contacto <a class="btn-link" href="mensajes.php" style="font-size:0.9rem;">Ver todos</a></h2>
     <table>
         <thead>
             <tr><th>Nombre</th><th>Correo</th><th>Asunto</th><th>Fecha</th><th>Estado</th></tr>
