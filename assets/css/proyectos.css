@@ -1,0 +1,26 @@
+.app-section { max-width: 1100px; margin: 30px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #2e7d32; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .nav-quick a { background: #e8f5e9; color: #1b5e20; padding: 8px 14px; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 600; margin-right: 8px; }
+        form.crear { background: #f9f9f9; padding: 18px; border-radius: 8px; border: 1px solid #e0e0e0; margin: 20px 0; }
+        input[type="text"], input[type="date"], select, textarea {
+            width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        button { background-color: #2e7d32; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; }
+        button:hover { background-color: #1b5e20; }
+        .grid-proyectos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 15px; }
+        .card-proyecto { border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #fafafa; }
+        .card-proyecto h3 { margin: 0 0 8px 0; color: #1b5e20; }
+        .estado-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; color: #fff; }
+        .e-planificado { background: #607d8b; }
+        .e-ejecucion { background: #1976d2; }
+        .e-finalizado { background: #2e7d32; }
+        .e-cancelado { background: #d32f2f; }
+        .btn-link { display: inline-block; margin-top: 10px; margin-right: 14px; color: #1b5e20; font-weight: 600; text-decoration: none; }
+        .meta { font-size: 0.85rem; color: #666; margin: 4px 0; }
+        .form-inline { display: inline; margin: 0; }
+        button.link-del { background: none; border: none; color: #d32f2f; padding: 0; font-weight: 600; cursor: pointer; font-size: 0.85rem; float: right; font-family: inherit; }
+        button.link-del:hover { background: none; text-decoration: underline; }
+        .filtros { margin: 14px 0; }
+        .filtros a { display: inline-block; padding: 5px 12px; border-radius: 14px; font-size: 0.82rem; text-decoration: none; color: #1b5e20; background: #e8f5e9; margin-right: 6px; }
+        .filtros a.activo { background: #2e7d32; color: #fff; }

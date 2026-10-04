@@ -33,32 +33,7 @@ if ($res_imgs) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <style>
-        .noticia-fotos {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 8px;
-            margin: 0 0 12px;
-        }
-        .noticia-fotos figure {
-            margin: 0;
-            background: #f4f6f4;
-            border: 1px solid #e4e4e4;
-            border-radius: 8px;
-            height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .noticia-fotos img {
-            max-width: 100%;
-            max-height: 180px;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/noticias.css">
 </head>
 
 <body>

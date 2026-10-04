@@ -1,0 +1,26 @@
+.app-section { max-width: 1100px; margin: 30px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #2e7d32; margin-bottom: 4px; }
+        .breadcrumb { font-size: 0.9rem; margin-bottom: 15px; }
+        .breadcrumb a { color: #1b5e20; text-decoration: none; }
+        form.crear { background: #f9f9f9; padding: 18px; border-radius: 8px; border: 1px solid #e0e0e0; margin: 20px 0; }
+        input[type="text"], input[type="date"], input[type="number"], textarea {
+            width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        button, .btn-action { background-color: #2e7d32; color: white; padding: 8px 14px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.9rem; font-family: inherit; }
+        button:hover, .btn-action:hover { background-color: #1b5e20; }
+        .card-actividad { border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #fafafa; margin-bottom: 14px; }
+        .card-actividad h3 { margin: 0 0 6px 0; color: #1b5e20; }
+        .estado-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; color: #fff; }
+        .e-programada { background: #607d8b; }
+        .e-ejecucion { background: #1976d2; }
+        .e-finalizada { background: #2e7d32; }
+        .e-cancelada { background: #d32f2f; }
+        .estado-part { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; color: #fff; margin-left: 6px; }
+        .p-inscrito { background: #f9a825; }
+        .p-participo { background: #2e7d32; }
+        .p-noparticipo { background: #9e9e9e; }
+        .meta { font-size: 0.85rem; color: #666; margin: 4px 0; }
+        .form-inline { display: inline; margin: 0; }
+        button.link-del { background: none; border: none; color: #d32f2f; padding: 0; font-weight: 600; cursor: pointer; font-size: 0.85rem; float: right; font-family: inherit; }
+        button.link-del:hover { background: none; text-decoration: underline; }
+        .acciones-fila { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
