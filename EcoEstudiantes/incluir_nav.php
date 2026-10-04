@@ -109,6 +109,26 @@ $rol = trim((string)$rol);
     .header-actions {
         display: flex;
         align-items: center;
+        gap: 14px;
+    }
+
+    .sesion-usuario {
+        text-align: right;
+        line-height: 1.25;
+    }
+
+    .sesion-usuario strong {
+        display: block;
+        color: #1b5e20;
+        font-size: 0.92rem;
+        font-weight: 700;
+    }
+
+    .sesion-usuario span {
+        display: block;
+        color: #8a633c;
+        font-size: 0.78rem;
+        font-weight: 600;
     }
 
     .logout-btn {
@@ -240,6 +260,10 @@ $rol = trim((string)$rol);
             justify-content: center;
         }
 
+        .sesion-usuario {
+            text-align: center;
+        }
+
         .main-nav {
             padding: 12px 10px;
         }
@@ -302,6 +326,13 @@ $rol = trim((string)$rol);
 
 
         <div class="header-actions">
+
+            <?php if (!empty($_SESSION['nombre']) || $rol !== ''): ?>
+            <div class="sesion-usuario">
+                <strong><?php echo htmlspecialchars($_SESSION['nombre'] ?? ''); ?></strong>
+                <span><?php echo htmlspecialchars($rol); ?></span>
+            </div>
+            <?php endif; ?>
 
             <a
                 href="<?php echo htmlspecialchars($prefix); ?>logout.php"
