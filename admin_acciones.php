@@ -327,7 +327,7 @@ try {
         $stmt->close();
         if ($fila) {
             $ruta = __DIR__ . "/images/galeria/" . basename($fila['archivo']);
-            if (is_file($ruta)) @unlink($ruta);
+            if (!preg_match('#^https?://#', $fila['archivo']) && is_file($ruta)) @unlink($ruta);
             $stmt = $conexion->prepare("DELETE FROM galeria WHERE id_foto = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();

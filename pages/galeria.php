@@ -30,36 +30,16 @@ $fotos = $conexion->query("SELECT titulo, archivo FROM galeria ORDER BY fecha_su
 
             <section class="gallery">
                 <div class="grid gallery-grid">
+                    <?php if ($fotos && $fotos->num_rows > 0): while ($foto = $fotos->fetch_assoc()):
+                        $src = preg_match('#^https?://#', $foto['archivo']) ? $foto['archivo'] : '../images/galeria/' . rawurlencode($foto['archivo']);
+                    ?>
                     <figure class="gallery-item">
-                        <img src="https://www.el19digital.com/files/articulos/251016.jpeg" alt="Estudiantes sembrando un arbol">
-                        <figcaption>Estudiantes sembrando un arbol</figcaption>
-                    </figure>
-                    <figure class="gallery-item">
-                        <img src="https://colaborativo.net/wp-content/uploads/2018/07/energia-solar.png" alt="Escuela con paneles solares">
-                        <figcaption>Escuela con paneles solares</figcaption>
-                    </figure>
-                    <figure class="gallery-item">
-                        <img src="https://img.freepik.com/fotos-premium/laptop-grafico_253658-3741.jpg" alt="Laptop con graficos ambientales">
-                        <figcaption>Laptop con graficos ambientales</figcaption>
-                    </figure>
-                    <figure class="gallery-item">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbRe-EOvSrxtvN98TK44BTrcP7eGH1YPHZLA&s" alt="Actividades de reciclaje">
-                        <figcaption>Reciclaje en la escuela</figcaption>
-                    </figure>
-                    <figure class="gallery-item">
-                        <img src="https://chilebio.cl/wp-content/uploads/2021/08/peces1.jpg" alt="Rio limpio con peces">
-                        <figcaption>Rio limpio con peces</figcaption>
-                    </figure>
-                    <figure class="gallery-item">
-                        <img src="https://bogota.gov.co/sites/default/files/styles/1050px/public/h1.jpg" alt="Estudiantes en huerta escolar">
-                        <figcaption>Huerta escolar comunitaria</figcaption>
-                    </figure>
-                    <?php if ($fotos && $fotos->num_rows > 0): while ($foto = $fotos->fetch_assoc()): ?>
-                    <figure class="gallery-item">
-                        <img src="../images/galeria/<?php echo rawurlencode($foto['archivo']); ?>" alt="<?php echo htmlspecialchars($foto['titulo']); ?>">
+                        <img src="<?php echo htmlspecialchars($src); ?>" alt="<?php echo htmlspecialchars($foto['titulo']); ?>">
                         <figcaption><?php echo htmlspecialchars($foto['titulo']); ?></figcaption>
                     </figure>
-                    <?php endwhile; endif; ?>
+                    <?php endwhile; else: ?>
+                    <p>Todavia no hay fotos en la galeria.</p>
+                    <?php endif; ?>
                 </div>
             </section>
 

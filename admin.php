@@ -191,7 +191,8 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
             <tr><td colspan="4">Todavia no hay fotos publicadas.</td></tr>
         <?php else: while ($g = $res_galeria->fetch_assoc()): ?>
             <tr>
-                <td><img src="images/galeria/<?php echo rawurlencode($g['archivo']); ?>" alt="" style="width:72px;height:52px;object-fit:cover;"></td>
+                <?php $src = preg_match('#^https?://#', $g['archivo']) ? $g['archivo'] : 'images/galeria/' . rawurlencode($g['archivo']); ?>
+                <td><img src="<?php echo htmlspecialchars($src); ?>" alt="" style="width:72px;height:52px;object-fit:cover;"></td>
                 <td><?php echo htmlspecialchars($g['titulo']); ?></td>
                 <td><?php echo date("d/m/Y", strtotime($g['fecha_subida'])); ?></td>
                 <td>
