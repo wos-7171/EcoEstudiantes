@@ -68,6 +68,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
         <a href="#usuarios">Usuarios</a>
         <a href="#noticias">Noticias</a>
         <a href="#galeria">Galeria</a>
+        <a href="#instituciones">Instituciones</a>
         <a href="#proyectos">Proyectos</a>
         <a href="#mensajes">Mensajes</a>
         <a href="indexprincipal.php">Ver sitio</a>
@@ -221,6 +222,31 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                 </td>
             </tr>
         <?php endwhile; endif; ?>
+        </tbody>
+    </table>
+
+    <h2 id="instituciones">Instituciones</h2>
+    <table>
+        <thead><tr><th>Nombre</th><th>Usuarios</th><th>Proyectos PRAE</th></tr></thead>
+        <tbody>
+        <?php
+        $res_lista_inst = $conexion->query(
+            "SELECT i.nombre,
+                    (SELECT COUNT(*) FROM usuarios u WHERE u.id_institucion = i.id_institucion) AS num_usuarios,
+                    (SELECT COUNT(*) FROM proyectos_prae p WHERE p.id_institucion = i.id_institucion) AS num_proyectos
+             FROM instituciones i ORDER BY i.nombre"
+        );
+        if ($res_lista_inst && $res_lista_inst->num_rows > 0):
+            while ($inst = $res_lista_inst->fetch_assoc()):
+        ?>
+            <tr>
+                <td><?php echo htmlspecialchars($inst['nombre']); ?></td>
+                <td><?php echo (int)$inst['num_usuarios']; ?></td>
+                <td><?php echo (int)$inst['num_proyectos']; ?></td>
+            </tr>
+        <?php endwhile; else: ?>
+            <tr><td colspan="3">Todavia no hay instituciones.</td></tr>
+        <?php endif; ?>
         </tbody>
     </table>
 
