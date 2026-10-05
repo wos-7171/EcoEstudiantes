@@ -133,19 +133,22 @@ $conexion->query(
 );
 $anio_max = fecha_anio_maximo();
 $evolucion = consultar($conexion,
-    "SELECT DATE_FORMAT(COALESCE(a.fecha_actividad, DATE(a.fecha_creacion)), '%Y-%m') AS mes,
-            COUNT(*) AS actividades,
-            COALESCE(SUM(a.estado = 'Finalizada'), 0) AS finalizadas
+    "SELECT COALESCE(a.fecha_actividad, DATE(a.fecha_creacion)) AS fecha,
+            a.estado
      FROM actividades a INNER JOIN proyectos_prae p ON p.id_proyecto = a.id_proyecto
-     WHERE $filtro
-       AND YEAR(COALESCE(a.fecha_actividad, DATE(a.fecha_creacion))) BETWEEN 2015 AND $anio_max
-     GROUP BY mes ORDER BY mes",
+     WHERE $filtro",
     $es_admin, $id_usuario);
 $mapa_tot = [];
 $mapa_fin = [];
+$mes_actual = date('Y-m');
 foreach ($evolucion as $fila) {
-    $mapa_tot[$fila['mes']] = (int)$fila['actividades'];
-    $mapa_fin[$fila['mes']] = (int)$fila['finalizadas'];
+    $fecha = (string)$fila['fecha'];
+    $anio = (int)substr($fecha, 0, 4);
+    $mes = ($anio >= 2015 && $anio <= $anio_max) ? substr($fecha, 0, 7) : $mes_actual;
+    $mapa_tot[$mes] = ($mapa_tot[$mes] ?? 0) + 1;
+    if ($fila['estado'] === 'Finalizada') {
+        $mapa_fin[$mes] = ($mapa_fin[$mes] ?? 0) + 1;
+    }
 }
 $nombres_mes = [1 => 'ene', 2 => 'feb', 3 => 'mar', 4 => 'abr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'ago', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dic'];
 $inicio = date('Y-m', strtotime('-5 months'));
@@ -238,7 +241,7 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
         </div>
         <div class="chart-box" style="grid-column: 1 / -1;">
             <h3>Evolucion de actividades en el tiempo</h3>
-            <p class="meta">Muestra como van creciendo las actividades. La linea azul es el total acumulado hasta ese mes. La verde es cuantas de esas ya estan finalizadas. No baja: cada mes suma lo nuevo.</p>
+            <p class="meta">La linea azul es el total de actividades hasta ese mes. La verde es cuantas ya estan finalizadas. Si una fecha esta mal escrita, esa actividad se cuenta en el mes actual para que no desaparezca.</p>
             <div class="chart-wrap"><canvas id="gEvolucion"></canvas></div>
         </div>
     </div>
@@ -333,7 +336,7 @@ $opts = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | J
                 { label: 'Finalizadas acumuladas', data: <?php echo json_encode($g_evo_fin); ?>, borderColor: verde, backgroundColor: 'rgba(46,125,50,0.12)', tension: 0.2, borderWidth: 3, pointRadius: 4, fill: true }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: entero } }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: entero }, plugins: { legend: { position: 'bottom' } } }
     });
 })();
 </script>
