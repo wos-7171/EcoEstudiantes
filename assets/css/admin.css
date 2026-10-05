@@ -8,6 +8,9 @@ footer p { margin-bottom:15px; }
 .social-links { display:flex; justify-content:center; gap:15px; }
 .social-links a { display:inline-flex; align-items:center; justify-content:center; border-radius:50%; width:40px; height:40px; }
 .social-links img { width:22px; height:22px; filter:brightness(0) invert(1); }
+.pie-instituciones { display:flex; justify-content:center; align-items:center; gap:16px; margin-top:14px; }
+.pie-instituciones a { display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; background:#fff; line-height:0; overflow:hidden; }
+.pie-instituciones img { width:38px; height:38px; max-width:38px; object-fit:contain; filter:none; }
 .social-links a[href*="facebook"] { background:#1877F2; }
 .social-links a[href*="instagram"] { background:#d6249f; }
 .social-links a[href*="x.com"] { background:#000; }
