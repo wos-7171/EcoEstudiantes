@@ -74,5 +74,6 @@ if (!$p) {
         <a class="btn-action" href="proyectos.php" style="background:#607d8b;">Cancelar</a>
     </form>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

@@ -152,5 +152,6 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
     </div>
     <?php endif; ?>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

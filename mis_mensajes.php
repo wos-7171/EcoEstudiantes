@@ -60,5 +60,6 @@ $res = $stmt->get_result();
     </div>
     <?php endwhile; endif; ?>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

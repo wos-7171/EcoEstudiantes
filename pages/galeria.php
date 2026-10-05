@@ -65,6 +65,7 @@ $fotos = $conexion->query("SELECT titulo, archivo FROM galeria ORDER BY fecha_su
             </section>
         </div>
     </main>
+<?php include("../includes/pie.php"); ?>
 </body>
 
 </html>

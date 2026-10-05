@@ -19,7 +19,8 @@ $rol = $_SESSION["rol"]; // 'Administrador' | 'Docente' | 'Estudiante'
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
-<body></body>
+<body><?php include("includes/pie.php"); ?>
+</body>
 <?php include("incluir_nav.php"); ?>
 
 <main>

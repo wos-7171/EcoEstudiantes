@@ -159,5 +159,6 @@ unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
     <?php endwhile; endif; ?>
 </div>
 <script src="assets/js/participantes.js"></script>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

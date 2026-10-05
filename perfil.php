@@ -97,5 +97,6 @@ if ($rol === 'Estudiante') {
         <button type="submit">Cambiar contrasena</button>
     </form>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

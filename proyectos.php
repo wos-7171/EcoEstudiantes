@@ -132,5 +132,6 @@ $res_proyectos = $conexion->query($sql);
     </div>
 </div>
 <script src="assets/js/proyectos.js"></script>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

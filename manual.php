@@ -55,5 +55,6 @@ $rol = $_SESSION["rol"] ?? "";
     </div>
     <?php endif; ?>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

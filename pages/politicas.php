@@ -111,6 +111,7 @@ $prefix = "../";
             </section>
         </div>
     </main>
+<?php include("../includes/pie.php"); ?>
 </body>
 
 </html>

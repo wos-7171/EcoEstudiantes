@@ -59,5 +59,6 @@ if (!($rol === 'Administrador' || ($rol === 'Docente' && (int)$a['id_responsable
         <a class="btn-action" href="actividades.php?id_proyecto=<?php echo (int)$a['id_proyecto']; ?>" style="background:#607d8b;">Cancelar</a>
     </form>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

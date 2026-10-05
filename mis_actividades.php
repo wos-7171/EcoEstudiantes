@@ -112,5 +112,6 @@ $promedio = $n_notas > 0 ? number_format($suma_notas / $n_notas, 1, '.', '') : '
     </div>
     <?php endforeach; endif; ?>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

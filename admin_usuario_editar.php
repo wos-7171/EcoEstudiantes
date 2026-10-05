@@ -63,5 +63,6 @@ $res_roles = $conexion->query("SELECT id_rol, nombre FROM roles ORDER BY id_rol"
         <a class="btn-action" href="admin.php" style="background:#607d8b;">Cancelar</a>
     </form>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>

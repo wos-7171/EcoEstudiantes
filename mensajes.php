@@ -75,5 +75,6 @@ $res = $conexion->query(
     </div>
     <?php endwhile; endif; ?>
 </div>
+<?php include("includes/pie.php"); ?>
 </body>
 </html>
