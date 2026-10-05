@@ -19,8 +19,7 @@ $rol = $_SESSION["rol"]; // 'Administrador' | 'Docente' | 'Estudiante'
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
-<body><?php include("includes/pie.php"); ?>
-</body>
+<body>
 <?php include("incluir_nav.php"); ?>
 
 <main>
@@ -60,6 +59,7 @@ $rol = $_SESSION["rol"]; // 'Administrador' | 'Docente' | 'Estudiante'
 
 
 
+<?php include("includes/pie.php"); ?>
 </body>
 
 </html>
