@@ -43,14 +43,7 @@ $res = $conexion->query(
         <?php else: while ($i = $res->fetch_assoc()): ?>
             <tr>
                 <td><?php echo (int)$i['id_institucion']; ?></td>
-                <td>
-                    <form action="instituciones_acciones.php" method="POST" style="display:flex; gap:6px; margin:0;">
-                        <input type="hidden" name="accion" value="editar">
-                        <input type="hidden" name="id" value="<?php echo (int)$i['id_institucion']; ?>">
-                        <input type="text" name="nombre" maxlength="150" required value="<?php echo htmlspecialchars($i['nombre']); ?>" style="margin:0;">
-                        <button type="submit" style="white-space:nowrap;">Guardar</button>
-                    </form>
-                </td>
+                <td><?php echo htmlspecialchars($i['nombre']); ?></td>
                 <td><?php echo (int)$i['num_usuarios']; ?></td>
                 <td><?php echo (int)$i['num_proyectos']; ?></td>
                 <td>
