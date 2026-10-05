@@ -334,9 +334,10 @@ footer .container {
     gap: 1.5rem;
 }
 
-.pie-instituciones { display: flex; justify-content: center; align-items: center; gap: 36px; margin-top: 4px; }
-.pie-instituciones a { display: flex; align-items: center; justify-content: center; line-height: 0; }
-.pie-instituciones img { height: 54px; width: auto; max-width: 86px; object-fit: contain; }
+.pie-instituciones { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 2px; }
+.pie-instituciones a { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: #fff; line-height: 0; overflow: hidden; }
+.pie-instituciones a:hover { transform: translateY(-2px); }
+.pie-instituciones img { height: 38px; width: 38px; object-fit: contain; }
 
 .social-links {
     display: flex;
