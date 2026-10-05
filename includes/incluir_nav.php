@@ -187,7 +187,12 @@ $rol = trim((string)$rol);
                     Mi Perfil
                 </a>
             </li>
-            <?php if ($rol !== 'Administrador'): ?>
+            <?php
+            $es_admin_nav = ($rol === 'Administrador')
+                || ((int)($_SESSION['id_rol'] ?? 0) === 1)
+                || (stripos((string)$rol, 'admin') !== false);
+            if (!$es_admin_nav):
+            ?>
             <li>
                 <a href="<?php echo htmlspecialchars($prefix); ?>mis_mensajes.php">
                     Mis mensajes

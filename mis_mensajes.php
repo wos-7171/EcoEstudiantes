@@ -6,7 +6,8 @@ if (!isset($_SESSION["id_usuario"])) {
     header("Location: index.php");
     exit();
 }
-if (($_SESSION["rol"] ?? "") === "Administrador") {
+$rol_sesion = $_SESSION["rol"] ?? "";
+if ($rol_sesion === "Administrador" || (int)($_SESSION["id_rol"] ?? 0) === 1 || stripos((string)$rol_sesion, "admin") !== false) {
     header("Location: mensajes.php");
     exit();
 }
