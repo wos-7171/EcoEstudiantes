@@ -145,12 +145,6 @@ $rol = trim((string)$rol);
                     </a>
                 </li>
 
-                <li>
-                    <a href="<?php echo htmlspecialchars($prefix); ?>instituciones.php">
-                        Instituciones
-                    </a>
-                </li>
-
             <?php endif; ?>
 
 
