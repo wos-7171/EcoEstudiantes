@@ -1,8 +1,8 @@
-body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f8; }
+body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f8; min-height: 100vh; display: flex; flex-direction: column; }
         .container { max-width: 1100px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h1 { color: #2e7d32; }
         h2 { color: #333; margin-top: 30px; border-bottom: 2px solid #2e7d32; padding-bottom: 5px; scroll-margin-top: 16px; }
-footer { background:#111; color:#fff; text-align:center; padding:20px 10px; margin-top:40px; }
+footer { background:#111; color:#fff; text-align:center; padding:20px 10px; margin-top:auto; }
 footer p { margin-bottom:15px; }
 .social-links { display:flex; justify-content:center; gap:15px; }
 .social-links a { display:inline-flex; align-items:center; justify-content:center; border-radius:50%; width:40px; height:40px; }

@@ -22,6 +22,9 @@ body {
     background-color: var(--paper-bg);
     color: var(--ink);
     line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     background-image: radial-gradient(circle at 10% 20%, rgba(246, 200, 95, 0.1) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(46, 158, 68, 0.1) 0%, transparent 20%);
 }
 
@@ -321,7 +324,7 @@ footer {
     background-color: var(--ink);
     color: white;
     padding: 2rem 0;
-    margin-top: 3rem;
+    margin-top: auto;
 }
 
 footer .container {
@@ -595,7 +598,7 @@ footer {
     color: #fff;
     text-align: center;
     padding: 20px 10px;
-    margin-top: 40px;
+    margin-top: auto;
 }
 
 footer .container {
@@ -659,4 +662,21 @@ footer p {
 
 .social-links img {
     filter: brightness(0) invert(1);
+}
+
+.pie-institucional {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    padding: 18px 16px 24px;
+    background: #fff;
+    border-top: 3px solid #2e7d32;
+}
+.pie-institucional img {
+    height: 92px;
+    width: auto;
+    max-width: 42vw;
+    object-fit: contain;
+    background: #fff;
 }
