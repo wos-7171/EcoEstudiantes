@@ -24,7 +24,7 @@
                 <img src="<?php echo $prefix; ?>images/instituciones/ieru.png" alt="Institucion Educativa Republica de Uruguay">
             </a>
             <a href="https://pascualbravo.edu.co/" target="_blank" rel="noopener noreferrer" title="Institucion Universitaria Pascual Bravo">
-                <img src="<?php echo $prefix; ?>images/instituciones/pascual-escudo.jpg" alt="Institucion Universitaria Pascual Bravo">
+                <img src="<?php echo $prefix; ?>images/instituciones/pascual-escudo.png" alt="Institucion Universitaria Pascual Bravo">
             </a>
         </div>
     </div>
