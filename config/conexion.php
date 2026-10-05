@@ -102,4 +102,35 @@ $col_archivo = $conexion->query("SHOW COLUMNS FROM galeria LIKE 'archivo'");
 if ($col_archivo && ($info = $col_archivo->fetch_assoc()) && strpos($info['Type'], '255') !== false) {
     $conexion->query("ALTER TABLE galeria MODIFY archivo VARCHAR(500) NOT NULL");
 }
+
+// Fechas imposibles (ano 4444, 0686, etc.) se pasan a hoy. No borra proyectos ni actividades.
+$anio_max = (int)date('Y') + 10;
+if ($tabla_proy && $tabla_proy->num_rows > 0) {
+    $conexion->query(
+        "UPDATE proyectos_prae
+         SET fecha_inicio = CURDATE()
+         WHERE fecha_inicio IS NOT NULL
+           AND (YEAR(fecha_inicio) < 2015 OR YEAR(fecha_inicio) > $anio_max)"
+    );
+    $conexion->query(
+        "UPDATE proyectos_prae
+         SET fecha_fin = CURDATE()
+         WHERE fecha_fin IS NOT NULL
+           AND (YEAR(fecha_fin) < 2015 OR YEAR(fecha_fin) > $anio_max)"
+    );
+    $conexion->query(
+        "UPDATE proyectos_prae
+         SET fecha_fin = fecha_inicio
+         WHERE fecha_inicio IS NOT NULL AND fecha_fin IS NOT NULL AND fecha_fin < fecha_inicio"
+    );
+}
+$tabla_act = $conexion->query("SHOW TABLES LIKE 'actividades'");
+if ($tabla_act && $tabla_act->num_rows > 0) {
+    $conexion->query(
+        "UPDATE actividades
+         SET fecha_actividad = CURDATE()
+         WHERE fecha_actividad IS NOT NULL
+           AND (YEAR(fecha_actividad) < 2015 OR YEAR(fecha_actividad) > $anio_max)"
+    );
+}
 ?>
