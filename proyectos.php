@@ -90,7 +90,10 @@ if ($rol === 'Administrador') {
     <?php endif; ?>
 
     <h2>Proyectos existentes</h2>
-    <input type="search" id="buscar-proyecto" maxlength="80" placeholder="Escribe para buscar por nombre, descripcion o docente" style="max-width:420px;">
+    <form class="crear" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;" onsubmit="return false;">
+        <input type="text" id="buscar-proyecto" maxlength="80" placeholder="Escribe para buscar por nombre, descripcion o docente" style="margin:0; max-width:420px;">
+        <button type="button">Buscar</button>
+    </form>
     <p class="meta" id="sin-resultados" style="display:none;">No hay proyectos con ese texto.</p>
     <div class="filtros">
         <a href="proyectos.php" class="activo" id="f-todos">Todos</a>
