@@ -6,6 +6,10 @@ if (!isset($_SESSION["id_usuario"])) {
     header("Location: index.php");
     exit();
 }
+if (($_SESSION["rol"] ?? "") === "Administrador") {
+    header("Location: mensajes.php");
+    exit();
+}
 
 $id = (int)$_SESSION["id_usuario"];
 $correo = $_SESSION["correo"] ?? "";

@@ -16,10 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($nombre === '' || $asunto === '' || $mensaje === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['flash_error'] = "Completa todos los campos con un correo valido.";
     } else {
+        $id_usuario = (int)$_SESSION["id_usuario"];
         $stmt = $conexion->prepare(
-            "INSERT INTO mensajes_contacto (nombre, correo, asunto, mensaje) VALUES (?, ?, ?, ?)"
+            "INSERT INTO mensajes_contacto (id_usuario, nombre, correo, asunto, mensaje) VALUES (?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("ssss", $nombre, $correo, $asunto, $mensaje);
+        $stmt->bind_param("issss", $id_usuario, $nombre, $correo, $asunto, $mensaje);
         if ($stmt->execute()) {
             $_SESSION['flash_ok'] = "Gracias. Tu mensaje fue enviado, te responderemos pronto.";
         } else {

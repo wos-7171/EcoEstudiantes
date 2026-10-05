@@ -2,6 +2,16 @@ body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f8;
         .container { max-width: 1100px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h1 { color: #2e7d32; }
         h2 { color: #333; margin-top: 30px; border-bottom: 2px solid #2e7d32; padding-bottom: 5px; scroll-margin-top: 16px; }
+footer { background:#111; color:#fff; text-align:center; padding:20px 10px; margin-top:40px; }
+footer p { margin-bottom:15px; }
+.social-links { display:flex; justify-content:center; gap:15px; }
+.social-links a { display:inline-flex; align-items:center; justify-content:center; border-radius:50%; width:40px; height:40px; }
+.social-links img { width:22px; height:22px; filter:brightness(0) invert(1); }
+.social-links a[href*="facebook"] { background:#1877F2; }
+.social-links a[href*="instagram"] { background:#d6249f; }
+.social-links a[href*="x.com"] { background:#000; }
+.social-links a[href*="youtube"] { background:#FF0000; }
+.social-links a[href*="tiktok"] { background:#000; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; }
         table, th, td { border: 1px solid #ddd; }
         th, td { padding: 10px; text-align: left; vertical-align: middle; }

@@ -87,11 +87,6 @@ $prefix = "../";
     </div>
 </main>
 
-<footer>
-    <div class="container">
-        <p>&copy; 2026 EcoEstudiantes Digitales - Todos los derechos reservados</p>
-    </div>
-</footer>
 </body>
 
 </html>
