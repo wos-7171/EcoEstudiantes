@@ -19,7 +19,7 @@ $accion = $_POST['accion'] ?? '';
 // Trae una actividad con el responsable de su proyecto
 function traer_actividad($conexion, $id_actividad) {
     $stmt = $conexion->prepare(
-        "SELECT a.*, p.id_responsable FROM actividades a
+        "SELECT a.*, p.id_responsable, p.id_institucion FROM actividades a
          INNER JOIN proyectos_prae p ON p.id_proyecto = a.id_proyecto
          WHERE a.id_actividad = ?"
     );
@@ -146,6 +146,14 @@ try {
             } elseif (!in_array($a['estado'], ['Programada', 'En ejecución'], true)) {
                 flash_error("Solo puedes inscribirte en actividades programadas o en ejecucion.");
             } else {
+                $stmt = $conexion->prepare("SELECT id_institucion FROM usuarios WHERE id_usuario = ?");
+                $stmt->bind_param("i", $id_usuario);
+                $stmt->execute();
+                $yo = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+                if (!$yo || (int)$yo['id_institucion'] !== (int)$a['id_institucion']) {
+                    flash_error("Solo puedes inscribirte en proyectos de tu institucion.");
+                } else {
                 $check = $conexion->prepare("SELECT id_participante FROM participantes WHERE id_actividad = ? AND id_usuario = ?");
                 $check->bind_param("ii", $id_actividad, $id_usuario);
                 $check->execute();
@@ -160,6 +168,7 @@ try {
                     $stmt->execute();
                     $stmt->close();
                     flash_ok("Te inscribiste en la actividad.");
+                }
                 }
             }
         }

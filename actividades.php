@@ -15,7 +15,7 @@ $id_proyecto = isset($_GET['id_proyecto']) ? intval($_GET['id_proyecto']) : 0;
 
 // Traer el proyecto
 $stmt = $conexion->prepare(
-    "SELECT p.id_proyecto, p.nombre, p.estado, p.id_responsable,
+    "SELECT p.id_proyecto, p.nombre, p.estado, p.id_responsable, p.id_institucion,
             u.nombre AS resp_nombre, u.apellido AS resp_apellido
      FROM proyectos_prae p
      LEFT JOIN usuarios u ON u.id_usuario = p.id_responsable
@@ -29,6 +29,17 @@ $stmt->close();
 if (!$proyecto) {
     header("Location: proyectos.php");
     exit();
+}
+if ($rol !== 'Administrador') {
+    $stmt = $conexion->prepare("SELECT id_institucion FROM usuarios WHERE id_usuario = ?");
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $yo = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    if (!$yo || (int)$yo['id_institucion'] !== (int)$proyecto['id_institucion']) {
+        header("Location: proyectos.php");
+        exit();
+    }
 }
 
 $es_responsable = ((int)$proyecto['id_responsable'] === (int)$id_usuario);

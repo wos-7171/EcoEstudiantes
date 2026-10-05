@@ -9,18 +9,34 @@ if (!isset($_SESSION["id_usuario"])) {
 }
 
 $rol = $_SESSION["rol"]; // 'Administrador' | 'Docente' | 'Estudiante'
+$id_usuario = (int)$_SESSION["id_usuario"];
 $puede_crear = ($rol === 'Administrador' || $rol === 'Docente');
 
-// Listado de proyectos: Administrador ve todos, Docente ve todos también (para
-// poder coordinarse), Estudiante ve todos en modo solo lectura.
-$sql = "SELECT p.id_proyecto, p.nombre, p.descripcion, p.objetivo, p.estado, p.articulacion_pei, p.impacto,
-               p.fecha_inicio, p.fecha_fin, p.id_responsable,
-               u.nombre AS resp_nombre, u.apellido AS resp_apellido,
-               (SELECT COUNT(*) FROM actividades a WHERE a.id_proyecto = p.id_proyecto) AS num_actividades
-        FROM proyectos_prae p
-        LEFT JOIN usuarios u ON u.id_usuario = p.id_responsable
-        ORDER BY p.fecha_creacion DESC";
-$res_proyectos = $conexion->query($sql);
+// El administrador ve todo. Docente y estudiante solo ven proyectos de su institucion.
+// El docente no se inscribe: solo consulta los de otros docentes de su colegio.
+if ($rol === 'Administrador') {
+    $sql = "SELECT p.id_proyecto, p.nombre, p.descripcion, p.objetivo, p.estado, p.articulacion_pei, p.impacto,
+                   p.fecha_inicio, p.fecha_fin, p.id_responsable, p.id_institucion,
+                   u.nombre AS resp_nombre, u.apellido AS resp_apellido,
+                   (SELECT COUNT(*) FROM actividades a WHERE a.id_proyecto = p.id_proyecto) AS num_actividades
+            FROM proyectos_prae p
+            LEFT JOIN usuarios u ON u.id_usuario = p.id_responsable
+            ORDER BY p.fecha_creacion DESC";
+    $res_proyectos = $conexion->query($sql);
+} else {
+    $sql = "SELECT p.id_proyecto, p.nombre, p.descripcion, p.objetivo, p.estado, p.articulacion_pei, p.impacto,
+                   p.fecha_inicio, p.fecha_fin, p.id_responsable, p.id_institucion,
+                   u.nombre AS resp_nombre, u.apellido AS resp_apellido,
+                   (SELECT COUNT(*) FROM actividades a WHERE a.id_proyecto = p.id_proyecto) AS num_actividades
+            FROM proyectos_prae p
+            LEFT JOIN usuarios u ON u.id_usuario = p.id_responsable
+            WHERE p.id_institucion = (SELECT id_institucion FROM usuarios WHERE id_usuario = ?)
+            ORDER BY p.fecha_creacion DESC";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $res_proyectos = $stmt->get_result();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -38,6 +54,9 @@ $res_proyectos = $conexion->query($sql);
 <div class="app-section">
     <h1>Proyectos PRAE</h1>
     <p>Sesión: <strong><?php echo htmlspecialchars($_SESSION['nombre']); ?></strong> (<?php echo htmlspecialchars($rol); ?>)</p>
+    <?php if ($rol !== 'Administrador'): ?>
+    <p class="meta">Solo ves los proyectos de tu institucion. El docente no se inscribe: gestiona los suyos y puede consultar los de otros docentes del mismo colegio.</p>
+    <?php endif; ?>
     <?php flash_mostrar(); ?>
 
     <?php if ($puede_crear): ?>
