@@ -95,6 +95,15 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                 <option value="<?php echo $rol_op['id_rol']; ?>"><?php echo htmlspecialchars($rol_op['nombre']); ?></option>
             <?php endwhile; $res_roles->data_seek(0); ?>
         </select>
+        <select name="id_institucion" required>
+            <?php
+            $res_inst = $conexion->query("SELECT id_institucion, nombre FROM instituciones ORDER BY nombre");
+            while ($inst = $res_inst->fetch_assoc()):
+            ?>
+            <option value="<?php echo (int)$inst['id_institucion']; ?>"><?php echo htmlspecialchars($inst['nombre']); ?></option>
+            <?php endwhile; ?>
+        </select>
+        <input type="text" name="institucion_nueva" maxlength="150" placeholder="Si no esta, escribe la institucion">
         <button type="submit">Crear Usuario</button>
     </form>
 

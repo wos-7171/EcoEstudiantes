@@ -133,4 +133,12 @@ if ($tabla_act && $tabla_act->num_rows > 0) {
            AND (YEAR(fecha_actividad) < 2015 OR YEAR(fecha_actividad) > $anio_max)"
     );
 }
+if ($tabla_proy && $tabla_proy->num_rows > 0) {
+    $conexion->query(
+        "UPDATE proyectos_prae p
+         INNER JOIN usuarios u ON u.id_usuario = p.id_responsable
+         SET p.id_institucion = u.id_institucion
+         WHERE u.id_institucion IS NOT NULL AND u.id_institucion > 0"
+    );
+}
 ?>

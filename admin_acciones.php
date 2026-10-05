@@ -52,15 +52,20 @@ try {
             if ($existe) {
                 flash_error("Ya existe un usuario con el correo $correo.");
             } else {
+                $id_institucion = institucion_resolver($conexion, $_POST['id_institucion'] ?? 0, $_POST['institucion_nueva'] ?? '');
+                if ($id_institucion === 0) {
+                    flash_error("Elige la institucion o escribe el nombre si no aparece.");
+                } else {
                 $hash = password_hash($clave, PASSWORD_BCRYPT);
                 $stmt = $conexion->prepare(
                     "INSERT INTO usuarios (id_rol, id_institucion, nombre, apellido, correo, password)
-                     VALUES (?, 1, ?, ?, ?, ?)"
+                     VALUES (?, ?, ?, ?, ?, ?)"
                 );
-                $stmt->bind_param("issss", $id_rol, $nombre, $apellido, $correo, $hash);
+                $stmt->bind_param("iissss", $id_rol, $id_institucion, $nombre, $apellido, $correo, $hash);
                 $stmt->execute();
                 $stmt->close();
                 flash_ok("Usuario creado correctamente.");
+                }
             }
         }
     }
@@ -105,20 +110,24 @@ try {
 
             if ($correo_en_uso) {
                 flash_error("Ese correo ya lo usa otro usuario.");
-            } elseif ($clave_nueva !== '' && count(password_errores($clave_nueva)) > 0) {
-                flash_error("La nueva contraseña debe tener: " . implode(', ', password_errores($clave_nueva)) . ".");
             } else {
+                $id_institucion = institucion_resolver($conexion, $_POST['id_institucion'] ?? 0, $_POST['institucion_nueva'] ?? '');
+                if ($id_institucion === 0) {
+                    flash_error("Elige la institucion o escribe el nombre si no aparece.");
+                } elseif ($clave_nueva !== '' && count(password_errores($clave_nueva)) > 0) {
+                    flash_error("La nueva contraseña debe tener: " . implode(', ', password_errores($clave_nueva)) . ".");
+                } else {
                 if ($clave_nueva !== '') {
                     $hash = password_hash($clave_nueva, PASSWORD_BCRYPT);
                     $stmt = $conexion->prepare(
-                        "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, id_rol = ?, password = ? WHERE id_usuario = ?"
+                        "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, id_rol = ?, id_institucion = ?, password = ? WHERE id_usuario = ?"
                     );
-                    $stmt->bind_param("sssisi", $nombre, $apellido, $correo, $id_rol, $hash, $id);
+                    $stmt->bind_param("sssissi", $nombre, $apellido, $correo, $id_rol, $id_institucion, $hash, $id);
                 } else {
                     $stmt = $conexion->prepare(
-                        "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, id_rol = ? WHERE id_usuario = ?"
+                        "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, id_rol = ?, id_institucion = ? WHERE id_usuario = ?"
                     );
-                    $stmt->bind_param("sssii", $nombre, $apellido, $correo, $id_rol, $id);
+                    $stmt->bind_param("sssiii", $nombre, $apellido, $correo, $id_rol, $id_institucion, $id);
                 }
                 $stmt->execute();
                 $stmt->close();
@@ -129,6 +138,7 @@ try {
                     $_SESSION['correo'] = $correo;
                 }
                 flash_ok("Usuario actualizado correctamente.");
+                }
             }
         }
     }

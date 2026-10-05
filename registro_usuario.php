@@ -21,9 +21,12 @@ $contrasena_conf = $_POST["contrasena_conf"] ?? $contrasena;
 
 // El autorregistro solo crea estudiantes. El docente lo crea el administrador.
 $id_rol = 3;
-$id_institucion = 1;
+$id_institucion = institucion_resolver($conexion, $_POST['id_institucion'] ?? 0, $_POST['institucion_nueva'] ?? '');
 
 // Validaciones del lado del servidor (no se confia solo en el JavaScript)
+if ($id_institucion === 0) {
+    aviso_y_volver('Elige tu institucion de la lista o escribe el nombre si no aparece.');
+}
 if ($nombre === '' || $apellido === '' || $correo === '') {
     aviso_y_volver('Completa todos los campos.');
 }

@@ -28,7 +28,12 @@ try {
         $impacto = trim($_POST['impacto'] ?? '');
         $fecha_inicio = fecha_permitida($_POST['fecha_inicio'] ?? '');
         $fecha_fin = fecha_permitida($_POST['fecha_fin'] ?? '');
-        $id_institucion = 1; // unica institucion registrada por ahora
+        $stmt = $conexion->prepare("SELECT id_institucion FROM usuarios WHERE id_usuario = ?");
+        $stmt->bind_param("i", $id_usuario);
+        $stmt->execute();
+        $fila_inst = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        $id_institucion = (int)($fila_inst['id_institucion'] ?? 1);
 
         if ($nombre === '' || mb_strlen($nombre) > 150) {
             flash_error("El nombre del proyecto es obligatorio (maximo 150 caracteres).");

@@ -11,7 +11,7 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 $stmt = $conexion->prepare(
-    "SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.id_rol, u.estado
+    "SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.id_rol, u.id_institucion, u.estado
      FROM usuarios u WHERE u.id_usuario = ?"
 );
 $stmt->bind_param("i", $id);
@@ -57,6 +57,16 @@ $res_roles = $conexion->query("SELECT id_rol, nombre FROM roles ORDER BY id_rol"
                 <option value="<?php echo $r['id_rol']; ?>" <?php echo (int)$r['id_rol'] === (int)$u['id_rol'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($r['nombre']); ?></option>
             <?php endwhile; ?>
         </select>
+        <label style="font-size:0.85rem; color:#555;">Institucion</label>
+        <select name="id_institucion" required>
+            <?php
+            $res_inst = $conexion->query("SELECT id_institucion, nombre FROM instituciones ORDER BY nombre");
+            while ($inst = $res_inst->fetch_assoc()):
+            ?>
+            <option value="<?php echo (int)$inst['id_institucion']; ?>" <?php echo (int)$inst['id_institucion'] === (int)$u['id_institucion'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($inst['nombre']); ?></option>
+            <?php endwhile; ?>
+        </select>
+        <input type="text" name="institucion_nueva" maxlength="150" placeholder="Si no esta, escribe la institucion">
         <label style="font-size:0.85rem; color:#555;">Nueva contrasena (opcional, dejar en blanco para no cambiarla)</label>
         <input type="password" name="contrasena" placeholder="Minimo 8, 1 mayuscula, 1 numero">
         <button type="submit">Guardar cambios</button>

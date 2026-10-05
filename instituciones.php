@@ -31,14 +31,8 @@ $res = $conexion->query(
 <div class="app-section">
     <div class="breadcrumb"><a href="admin.php">Panel de administracion</a></div>
     <h1>Instituciones educativas</h1>
+    <p class="meta">La lista crece cuando un estudiante se registra o cuando el administrador crea un docente o un estudiante y escribe una institucion nueva.</p>
     <?php flash_mostrar(); ?>
-
-    <h2>Registrar nueva institucion</h2>
-    <form class="crear" action="instituciones_acciones.php" method="POST">
-        <input type="hidden" name="accion" value="crear">
-        <input type="text" name="nombre" placeholder="Nombre de la institucion" maxlength="150" required>
-        <button type="submit">Crear institucion</button>
-    </form>
 
     <h2>Instituciones registradas</h2>
     <table class="tabla">

@@ -11,6 +11,10 @@
 </head>
 
 <body>
+<?php
+include("conexion.php");
+$lista_instituciones = $conexion->query("SELECT id_institucion, nombre FROM instituciones ORDER BY nombre");
+?>
 
     <div class="login-container">
         <div class="login-card">
@@ -87,6 +91,16 @@
                         <span class="error-msg" id="regEmailError"></span>
                     </div>
 
+                    <div class="form-group">
+                        <label for="regInstitucion">Institucion educativa</label>
+                        <select id="regInstitucion" name="id_institucion">
+                            <option value="">Elige una de la lista</option>
+                            <?php if ($lista_instituciones): while ($inst = $lista_instituciones->fetch_assoc()): ?>
+                            <option value="<?php echo (int)$inst['id_institucion']; ?>"><?php echo htmlspecialchars($inst['nombre']); ?></option>
+                            <?php endwhile; endif; ?>
+                        </select>
+                        <input type="text" name="institucion_nueva" maxlength="150" placeholder="Si no esta, escribe el nombre aqui">
+                    </div>
                     <div class="form-group">
                         <label for="regRol">Rol</label>
                         <input type="hidden" name="rol" value="3">

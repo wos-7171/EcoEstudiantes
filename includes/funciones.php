@@ -99,6 +99,42 @@ function formato_nota($nota) {
     return number_format((float)$nota, 1, '.', '');
 }
 
+// Usa la institucion elegida, o crea una nueva si escribieron un nombre que no existe.
+function institucion_resolver($conexion, $id_elegido, $nombre_nuevo) {
+    $nombre_nuevo = trim((string)$nombre_nuevo);
+    if ($nombre_nuevo !== '') {
+        if (mb_strlen($nombre_nuevo) > 150) {
+            return 0;
+        }
+        $stmt = $conexion->prepare("SELECT id_institucion FROM instituciones WHERE nombre = ?");
+        $stmt->bind_param("s", $nombre_nuevo);
+        $stmt->execute();
+        $fila = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if ($fila) {
+            return (int)$fila['id_institucion'];
+        }
+        $stmt = $conexion->prepare("INSERT INTO instituciones (nombre) VALUES (?)");
+        $stmt->bind_param("s", $nombre_nuevo);
+        $stmt->execute();
+        $nuevo = (int)$stmt->insert_id;
+        $stmt->close();
+        return $nuevo;
+    }
+    $id_elegido = (int)$id_elegido;
+    if ($id_elegido > 0) {
+        $stmt = $conexion->prepare("SELECT id_institucion FROM instituciones WHERE id_institucion = ?");
+        $stmt->bind_param("i", $id_elegido);
+        $stmt->execute();
+        $fila = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if ($fila) {
+            return (int)$fila['id_institucion'];
+        }
+    }
+    return 0;
+}
+
 
 // ---------- Archivos de evidencia ----------
 function borrar_archivo_evidencia($archivo) {
