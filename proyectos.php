@@ -11,6 +11,8 @@ if (!isset($_SESSION["id_usuario"])) {
 $rol = $_SESSION["rol"]; // 'Administrador' | 'Docente' | 'Estudiante'
 $id_usuario = (int)$_SESSION["id_usuario"];
 $puede_crear = ($rol === 'Administrador' || $rol === 'Docente');
+$buscar = trim($_GET['q'] ?? '');
+$like = '%' . $buscar . '%';
 
 // El administrador ve todo. Docente y estudiante solo ven proyectos de su institucion.
 // El docente no se inscribe: solo consulta los de otros docentes de su colegio.
@@ -21,8 +23,12 @@ if ($rol === 'Administrador') {
                    (SELECT COUNT(*) FROM actividades a WHERE a.id_proyecto = p.id_proyecto) AS num_actividades
             FROM proyectos_prae p
             LEFT JOIN usuarios u ON u.id_usuario = p.id_responsable
+            WHERE (? = '' OR p.nombre LIKE ? OR p.descripcion LIKE ? OR u.nombre LIKE ? OR u.apellido LIKE ?)
             ORDER BY p.fecha_creacion DESC";
-    $res_proyectos = $conexion->query($sql);
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("sssss", $buscar, $like, $like, $like, $like);
+    $stmt->execute();
+    $res_proyectos = $stmt->get_result();
 } else {
     $sql = "SELECT p.id_proyecto, p.nombre, p.descripcion, p.objetivo, p.estado, p.articulacion_pei, p.impacto,
                    p.fecha_inicio, p.fecha_fin, p.id_responsable, p.id_institucion,
@@ -31,9 +37,10 @@ if ($rol === 'Administrador') {
             FROM proyectos_prae p
             LEFT JOIN usuarios u ON u.id_usuario = p.id_responsable
             WHERE p.id_institucion = (SELECT id_institucion FROM usuarios WHERE id_usuario = ?)
+              AND (? = '' OR p.nombre LIKE ? OR p.descripcion LIKE ? OR u.nombre LIKE ? OR u.apellido LIKE ?)
             ORDER BY p.fecha_creacion DESC";
     $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("i", $id_usuario);
+    $stmt->bind_param("isssss", $id_usuario, $buscar, $like, $like, $like, $like);
     $stmt->execute();
     $res_proyectos = $stmt->get_result();
 }
@@ -90,6 +97,13 @@ if ($rol === 'Administrador') {
     <?php endif; ?>
 
     <h2>Proyectos existentes</h2>
+    <form method="GET" action="proyectos.php" class="crear" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <input type="text" name="q" maxlength="80" value="<?php echo htmlspecialchars($buscar); ?>" placeholder="Buscar por nombre, descripcion o docente" style="margin:0; max-width:360px;">
+        <button type="submit">Buscar</button>
+        <?php if ($buscar !== ''): ?>
+        <a href="proyectos.php">Quitar busqueda</a>
+        <?php endif; ?>
+    </form>
     <div class="filtros">
         <a href="proyectos.php" class="activo" id="f-todos">Todos</a>
         <a href="#" data-estado="Planificado">Planificado</a>
