@@ -1,10 +1,9 @@
 <?php
-session_start();
-include("conexion.php");
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
-    exit();
-}
+require_once __DIR__ . '/includes/funciones.php';
+sesion_iniciar();
+require_once __DIR__ . '/conexion.php';
+
+$usuario_actual = usuario_verificar_activo($conexion, null, true);
 $rol = $_SESSION["rol"] ?? "";
 ?>
 <!DOCTYPE html>

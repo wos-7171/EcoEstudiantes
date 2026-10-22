@@ -124,13 +124,6 @@ $g_rank_lbl = array_map(fn($r) => $r['nombre'] . ' ' . $r['apellido'], $ranking)
 $g_rank_val = array_map(fn($r) => (float)$r['promedio'], $ranking);
 
 // ---------- 5. Evolucion de actividades en el tiempo (por mes) ----------
-// Si el proyecto ya esta Finalizado, sus actividades tambien quedan Finalizada.
-$conexion->query(
-    "UPDATE actividades a
-     INNER JOIN proyectos_prae p ON p.id_proyecto = a.id_proyecto
-     SET a.estado = 'Finalizada'
-     WHERE p.estado = 'Finalizado' AND a.estado <> 'Cancelada'"
-);
 $anio_max = fecha_anio_maximo();
 $evolucion = consultar($conexion,
     "SELECT COALESCE(a.fecha_actividad, DATE(a.fecha_creacion)) AS fecha,

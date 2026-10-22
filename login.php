@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/funciones.php';
+sesion_iniciar();
 include("conexion.php");
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -37,11 +38,13 @@ if ($resultado && $resultado->num_rows > 0) {
     if (password_verify($contrasena, $usuario["password"])) {
 
         session_regenerate_id(true); // evita fijacion de sesion
-        $_SESSION["id_usuario"] = $usuario["id_usuario"];
-        $_SESSION["nombre"]     = $usuario["nombre"] . " " . $usuario["apellido"];
-        $_SESSION["correo"]     = $usuario["correo"];
-        $_SESSION["id_rol"]     = (int)$usuario["id_rol"];
-        $_SESSION["rol"]        = $usuario["rol_nombre"]; // 'Administrador' | 'Docente' | 'Estudiante'
+        $_SESSION["id_usuario"]    = (int)$usuario["id_usuario"];
+        $_SESSION["nombre"]        = $usuario["nombre"] . " " . $usuario["apellido"];
+        $_SESSION["correo"]        = $usuario["correo"];
+        $_SESSION["id_rol"]        = (int)$usuario["id_rol"];
+        $_SESSION["rol"]           = $usuario["rol_nombre"]; // 'Administrador' | 'Docente' | 'Estudiante'
+        $_SESSION["ultimo_acceso"] = time();
+        $_SESSION["csrf_token"]    = bin2hex(random_bytes(32));
 
         $stmt->close();
         $conexion->close();

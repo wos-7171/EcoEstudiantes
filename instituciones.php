@@ -1,12 +1,9 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/funciones.php';
+sesion_iniciar();
+require_once __DIR__ . '/conexion.php';
 
-if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
-    header("Location: index.php");
-    exit();
-}
+$usuario_actual = usuario_verificar_activo($conexion, 'Administrador', true);
 $rol = $_SESSION["rol"];
 
 $res = $conexion->query(

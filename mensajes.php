@@ -1,12 +1,10 @@
 <?php
-session_start();
-include("conexion.php");
+require_once __DIR__ . '/includes/funciones.php';
+sesion_iniciar();
+require_once __DIR__ . '/conexion.php';
 
 // Solo el administrador lee los mensajes de contacto
-if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
-    header("Location: index.php");
-    exit();
-}
+$usuario_actual = usuario_verificar_activo($conexion, 'Administrador', true);
 $rol = $_SESSION["rol"];
 
 $res = $conexion->query(
@@ -29,8 +27,7 @@ $res = $conexion->query(
 <div class="app-section">
     <div class="breadcrumb"><a href="admin.php">Panel de administracion</a></div>
     <h1>Mensajes de contacto</h1>
-    <?php if (!empty($_SESSION['flash_ok'])): ?><div class="aviso aviso-ok"><?php echo htmlspecialchars($_SESSION['flash_ok']); unset($_SESSION['flash_ok']); ?></div><?php endif; ?>
-    <?php if (!empty($_SESSION['flash_error'])): ?><div class="aviso aviso-error"><?php echo htmlspecialchars($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?></div><?php endif; ?>
+    <?php flash_mostrar(); ?>
 
     <?php if ($res->num_rows === 0): ?>
         <p class="vacio">No hay mensajes de contacto todavia.</p>

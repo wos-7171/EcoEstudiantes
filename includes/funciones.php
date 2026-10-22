@@ -2,15 +2,259 @@
 // Funciones compartidas por varios modulos (mensajes, contrasenas, borrados seguros).
 // Se incluye con: include("funciones.php");
 
+// ========== SEGURIDAD DE SESIONES Y PROTECCIÓN CSRF (FASE 3.1) ==========
+
+// Detecta si la conexion actual utiliza HTTPS real comprobado por el servidor web
+function sesion_es_https() {
+    // 1. Directivas nativas del servidor web (Apache / IIS / SSL)
+    if (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') {
+        return true;
+    }
+    if (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) {
+        return true;
+    }
+
+    // 2. Proxies inversos: NO se confía ciegamente en HTTP_X_FORWARDED_PROTO
+    //    porque cualquier cliente directo por HTTP plano podría falsearla para forzar
+    //    cookies 'Secure' que el navegador nunca devolvería en HTTP (bloqueando la sesión).
+    //    Solo se evalúa si existe una lista explícita y verificable de proxies confiables.
+    if (defined('PROXIES_CONFIABLES') && is_array(PROXIES_CONFIABLES) && !empty($_SERVER['REMOTE_ADDR'])) {
+        if (in_array($_SERVER['REMOTE_ADDR'], PROXIES_CONFIABLES, true)) {
+            if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// Inicia la sesion configurando previamente cookies seguras (HttpOnly, SameSite=Lax, Secure condicionado)
+function sesion_iniciar() {
+    if (session_status() === PHP_SESSION_NONE) {
+        $seguro = sesion_es_https();
+
+        session_set_cookie_params([
+            'lifetime' => 0,        // Expira al cerrar el navegador
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => $seguro,  // Solo se activa en conexiones HTTPS reales
+            'httponly' => true,     // Impide acceso a la cookie por JavaScript
+            'samesite' => 'Lax'     // Mitiga ataques CSRF entre dominios
+        ]);
+
+        session_start();
+    }
+
+    if (isset($_SESSION['id_usuario'])) {
+        sesion_controlar_inactividad(3600);
+    }
+}
+
+// Destruye por completo la sesion actual y expira la cookie asociada
+function sesion_destruir() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+        $p = session_get_cookie_params();
+        setcookie(
+            session_name(),
+            '',
+            time() - 42000,
+            $p["path"] ?? '/',
+            $p["domain"] ?? '',
+            $p["secure"] ?? false,
+            $p["httponly"] ?? true
+        );
+    }
+    session_destroy();
+}
+
+// Controla la expiracion por inactividad (60 minutos por defecto).
+// Requiere que la sesion ya este activa; si no lo esta, no hay nada que controlar.
+function sesion_controlar_inactividad($segundos_max = 3600, $redirigir = true) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        return true;
+    }
+
+    if (!isset($_SESSION['id_usuario'])) {
+        return true;
+    }
+
+    $ahora = time();
+
+    if (isset($_SESSION['ultimo_acceso']) && ($ahora - (int)$_SESSION['ultimo_acceso'] > $segundos_max)) {
+        sesion_destruir();
+        if ($redirigir) {
+            sesion_iniciar();
+            flash_error('Tu sesión ha expirado por inactividad (60 minutos). Por favor, inicia sesión nuevamente.');
+            if (!headers_sent()) {
+                header('Location: index.php');
+            } else {
+                echo "<script>window.location.href='index.php';</script>";
+            }
+            exit();
+        }
+        return false;
+    }
+
+    $_SESSION['ultimo_acceso'] = $ahora;
+    return true;
+}
+
+// Genera o devuelve el token CSRF activo de la sesion (no se regenera en peticiones GET).
+// Requiere sesion activa.
+function csrf_token() {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        return '';
+    }
+    if (empty($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+// Genera el campo oculto HTML listo para insertar en formularios
+function csrf_campo() {
+    $token = csrf_token();
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+}
+
+// Valida un token CSRF con comparacion resistente a ataques de temporizacion (hash_equals).
+// Requiere sesion activa.
+function csrf_validar($token = null) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        return false;
+    }
+
+    if (empty($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
+        return false;
+    }
+
+    if ($token === null) {
+        if (isset($_POST['csrf_token'])) {
+            $token = $_POST['csrf_token'];
+        } elseif (isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+            $token = $_SERVER['HTTP_X_CSRF_TOKEN'];
+        } else {
+            return false;
+        }
+    }
+
+    if (!is_string($token) || $token === '') {
+        return false;
+    }
+
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
+// Verifica en base de datos si el usuario de la sesion sigue existiendo, activo y con el rol adecuado.
+// Requiere sesion activa.
+function usuario_verificar_activo($conexion, $rol_esperado = null, $auto_redirigir = false) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        return false;
+    }
+
+    if (empty($_SESSION['id_usuario'])) {
+        if ($auto_redirigir) {
+            flash_error('Debes iniciar sesión para acceder.');
+            if (!headers_sent()) {
+                header('Location: index.php');
+            } else {
+                echo "<script>window.location.href='index.php';</script>";
+            }
+            exit();
+        }
+        return false;
+    }
+
+    $id_usuario = (int)$_SESSION['id_usuario'];
+
+    $stmt = $conexion->prepare(
+        "SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.id_rol, r.nombre AS rol_nombre, u.estado
+         FROM usuarios u
+         INNER JOIN roles r ON r.id_rol = u.id_rol
+         WHERE u.id_usuario = ?
+         LIMIT 1"
+    );
+    if (!$stmt) {
+        return false;
+    }
+
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $usuario = $resultado ? $resultado->fetch_assoc() : null;
+    $stmt->close();
+
+    // Cuenta no existente o desactivada
+    if (!$usuario || (int)$usuario['estado'] !== 1) {
+        sesion_destruir();
+        if ($auto_redirigir) {
+            sesion_iniciar();
+            flash_error('Tu cuenta ha sido desactivada. Contacta al administrador.');
+            if (!headers_sent()) {
+                header('Location: index.php');
+            } else {
+                echo "<script>window.location.href='index.php';</script>";
+            }
+            exit();
+        }
+        return false;
+    }
+
+    // Sincronizar datos de rol y sesion con la base de datos
+    $_SESSION['id_rol'] = (int)$usuario['id_rol'];
+    $_SESSION['rol']    = $usuario['rol_nombre'];
+    $_SESSION['nombre'] = $usuario['nombre'] . ' ' . $usuario['apellido'];
+    $_SESSION['correo'] = $usuario['correo'];
+
+    // Comprobacion de rol si fue solicitado
+    if ($rol_esperado !== null) {
+        $autorizado = false;
+        if (is_array($rol_esperado)) {
+            $autorizado = in_array($usuario['rol_nombre'], $rol_esperado, true);
+        } else {
+            $autorizado = ($usuario['rol_nombre'] === $rol_esperado);
+        }
+
+        if (!$autorizado) {
+            if ($auto_redirigir) {
+                flash_error('No tienes permisos suficientes para acceder a este recurso.');
+                $destino = ($usuario['rol_nombre'] === 'Administrador') ? 'admin.php' : 'indexprincipal.php';
+                if (!headers_sent()) {
+                    header("Location: $destino");
+                } else {
+                    echo "<script>window.location.href='$destino';</script>";
+                }
+                exit();
+            }
+            return false;
+        }
+    }
+
+    return $usuario;
+}
+
 // ---------- Mensajes de aviso (se guardan en la sesion y se muestran una sola vez) ----------
+// Estas funciones requieren que la sesion ya este activa (sesion_iniciar ya fue llamado).
 function flash_ok($mensaje) {
-    $_SESSION['flash_ok'] = $mensaje;
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        $_SESSION['flash_ok'] = $mensaje;
+    }
 }
 function flash_error($mensaje) {
-    $_SESSION['flash_error'] = $mensaje;
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        $_SESSION['flash_error'] = $mensaje;
+    }
 }
 
 function flash_mostrar() {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        return;
+    }
     if (!empty($_SESSION['flash_ok'])) {
         echo '<div class="aviso aviso-ok">' . htmlspecialchars($_SESSION['flash_ok']) . '</div>';
     }
