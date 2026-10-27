@@ -129,6 +129,8 @@ Los archivos **no** incluyen `CREATE DATABASE` ni `USE`, así que funcionan en h
 
 Si phpMyAdmin muestra advertencias sobre `SET FOREIGN_KEY_CHECKS`, normalmente son informativas. Verifica al final que existan las 12 tablas.
 
+> Las evidencias no se incluyen en el ZIP por privacidad. En una instalación nueva se suben desde la web. Si migras una base de datos que ya tiene evidencias, copia también las carpetas `uploads/evidencias/` y `evidencias/` al hosting. Si falta un archivo, la web mostrará **“Archivo no disponible”** en lugar de una imagen rota.
+
 ### 3.6. Permisos
 
 - Archivos: `644`.
@@ -186,12 +188,14 @@ Pasos obligatorios:
 
 ### 5.2. Revisar el límite de subida
 
-El código permite evidencias de hasta **20 MB**, pero el hosting gratuito puede tener un límite menor. Revisa en el panel:
+El código permite evidencias de hasta **20 MB**, pero se ajusta automáticamente si el hosting tiene un límite menor (por ejemplo, en InfinityFree). La pantalla de subida muestra el máximo real permitido.
+
+Para revisar los límites del hosting:
 
 - `upload_max_filesize`
 - `post_max_size`
 
-Si el límite es menor, ajusta el mensaje o el tamaño máximo en `subir_evidencia_acciones.php`.
+No hace falta editar el código: se toma el menor de los tres valores (20 MB, `upload_max_filesize` y `post_max_size`).
 
 ---
 

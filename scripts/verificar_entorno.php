@@ -55,6 +55,32 @@ foreach ($tablas as $tabla) {
     }
 }
 
+// Archivos de evidencia: la fila existe en la base y el archivo debe existir en disco.
+$res_ev = $conexion->query("SELECT id_evidencia, archivo FROM evidencias ORDER BY id_evidencia");
+if ($res_ev) {
+    $total_ev = 0;
+    $faltantes_ev = [];
+    while ($ev = $res_ev->fetch_assoc()) {
+        $total_ev++;
+        $nombre = basename((string)$ev['archivo']);
+        $encontrado = false;
+        foreach (['uploads/evidencias', 'evidencias'] as $carpeta) {
+            if ($nombre !== '' && is_file($raiz . '/' . $carpeta . '/' . $nombre)) {
+                $encontrado = true;
+                break;
+            }
+        }
+        if (!$encontrado) {
+            $faltantes_ev[] = (int)$ev['id_evidencia'];
+        }
+    }
+    if ($faltantes_ev) {
+        $avisos[] = 'Evidencias registradas sin archivo en el servidor (IDs: ' . implode(', ', $faltantes_ev) . ').';
+    } elseif ($total_ev > 0) {
+        linea('OK', $total_ev . ' evidencias con archivo disponible');
+    }
+}
+
 // Permisos de escritura
 foreach (['uploads/evidencias', 'images/noticias', 'images/galeria', 'evidencias'] as $carpeta) {
     $ruta = $raiz . '/' . $carpeta;

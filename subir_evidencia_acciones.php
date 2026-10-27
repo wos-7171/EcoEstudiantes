@@ -6,6 +6,16 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit();
 }
 $usuario_actual = requiere_usuario($conexion, 'Estudiante', 'proyectos.php');
+
+// Si el formulario supera post_max_size, PHP descarta $_POST y $_FILES.
+$post_max = bytes_desde_ini(ini_get('post_max_size'));
+$content_length = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+if ($post_max > 0 && $content_length > $post_max) {
+    flash_error('El archivo es demasiado grande. El máximo permitido es ' . evidencia_limite_mb() . ' MB.');
+    header('Location: mis_actividades.php');
+    exit();
+}
+
 csrf_exigir();
 
 $id_usuario = (int)$_SESSION["id_usuario"];
@@ -64,7 +74,7 @@ if ($accion === 'subir') {
     if (!isset($_FILES['archivo']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
         $codigo = $_FILES['archivo']['error'] ?? UPLOAD_ERR_NO_FILE;
         if ($codigo === UPLOAD_ERR_INI_SIZE || $codigo === UPLOAD_ERR_FORM_SIZE) {
-            $_SESSION['flash_error'] = "El archivo es demasiado grande (maximo 20 MB).";
+            $_SESSION['flash_error'] = "El archivo es demasiado grande (maximo " . evidencia_limite_mb() . " MB).";
         } elseif ($codigo === UPLOAD_ERR_NO_FILE) {
             $_SESSION['flash_error'] = "Debes elegir un archivo.";
         } else {
@@ -75,9 +85,9 @@ if ($accion === 'subir') {
     }
 
     $archivo = $_FILES['archivo'];
-    $max_bytes = 20 * 1024 * 1024;
+    $max_bytes = evidencia_limite_bytes();
     if ($archivo['size'] > $max_bytes || $archivo['size'] <= 0) {
-        $_SESSION['flash_error'] = "El archivo debe pesar entre 1 byte y 20 MB.";
+        $_SESSION['flash_error'] = "El archivo debe pesar entre 1 byte y " . evidencia_limite_mb() . " MB.";
         header("Location: " . $volver);
         exit();
     }

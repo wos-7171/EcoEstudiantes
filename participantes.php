@@ -62,6 +62,9 @@ while ($e = $res_ev->fetch_assoc()) {
 $flash_ok = $_SESSION['flash_ok'] ?? null;
 $flash_error = $_SESSION['flash_error'] ?? null;
 unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
+
+$version_styles = (int)@filemtime(__DIR__ . '/assets/css/styles.css');
+$version_app = (int)@filemtime(__DIR__ . '/assets/css/app.css');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -70,8 +73,8 @@ unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Participantes - <?php echo htmlspecialchars($actividad['nombre']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=<?php echo $version_styles; ?>">
+    <link rel="stylesheet" href="assets/css/app.css?v=<?php echo $version_app; ?>">
 </head>
 <body>
 <?php include("incluir_nav.php"); ?>
@@ -111,14 +114,22 @@ unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
             <p class="meta">Este estudiante todavia no ha subido evidencias.</p>
         <?php else: ?>
         <div class="evid-grid">
-            <?php foreach ($evs as $e): $url = "uploads/evidencias/" . rawurlencode($e['archivo']); ?>
-            <div class="evid">
-                <?php if ($e['tipo'] === 'Imagen'): ?>
-                    <a href="<?php echo $url; ?>" target="_blank"><img src="<?php echo $url; ?>" alt="Evidencia"></a>
+            <?php foreach ($evs as $e):
+                $url = evidencia_url($e['archivo'], $e['tipo']);
+                $url_segura = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+            ?>
+            <div class="evid<?php echo $url === '' ? ' evid-faltante' : ''; ?>">
+                <?php if ($url === ''): ?>
+                    <div class="evid-placeholder">
+                        <strong>Archivo no disponible</strong>
+                        <small>La evidencia está registrada, pero el archivo no está en el servidor.</small>
+                    </div>
+                <?php elseif ($e['tipo'] === 'Imagen'): ?>
+                    <a href="<?php echo $url_segura; ?>" target="_blank" rel="noopener"><img src="<?php echo $url_segura; ?>" alt="Evidencia" loading="lazy"></a>
                 <?php elseif ($e['tipo'] === 'Video'): ?>
-                    <video src="<?php echo $url; ?>" controls preload="metadata"></video>
+                    <video src="<?php echo $url_segura; ?>" controls preload="metadata"></video>
                 <?php else: ?>
-                    <a class="doc" href="<?php echo $url; ?>" target="_blank"><?php echo htmlspecialchars($e['tipo']); ?><br>Abrir / descargar</a>
+                    <a class="doc" href="<?php echo $url_segura; ?>" target="_blank" rel="noopener"><?php echo htmlspecialchars($e['tipo']); ?><br>Abrir / descargar</a>
                 <?php endif; ?>
                 <p><strong><?php echo htmlspecialchars($e['tipo']); ?></strong> - <?php echo date("d/m/Y H:i", strtotime($e['fecha_subida'])); ?></p>
                 <?php if ($e['descripcion']): ?><p><?php echo nl2br(htmlspecialchars($e['descripcion'])); ?></p><?php endif; ?>

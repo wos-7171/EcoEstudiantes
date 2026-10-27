@@ -61,6 +61,9 @@ $clase_part = [
     'Inscrito' => 'p-inscrito', 'Participó' => 'p-participo', 'No participó' => 'p-noparticipo',
 ][$inscripcion['estado']] ?? 'p-inscrito';
 $cancelada = ($actividad['estado'] === 'Cancelada');
+
+$version_styles = (int)@filemtime(__DIR__ . '/assets/css/styles.css');
+$version_app = (int)@filemtime(__DIR__ . '/assets/css/app.css');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -69,8 +72,8 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subir evidencia - <?php echo htmlspecialchars($actividad['nombre']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=<?php echo $version_styles; ?>">
+    <link rel="stylesheet" href="assets/css/app.css?v=<?php echo $version_app; ?>">
 </head>
 <body>
 <?php include("incluir_nav.php"); ?>
@@ -103,7 +106,7 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
 <?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="subir">
         <input type="hidden" name="id_actividad" value="<?php echo $id_actividad; ?>">
-        <label style="font-size:0.85rem; color:#555;">Archivo (foto, video o documento, maximo 20 MB)</label>
+        <label style="font-size:0.85rem; color:#555;">Archivo (foto, video o documento, maximo <?php echo evidencia_limite_mb(); ?> MB)</label>
         <input type="file" name="archivo" required
                accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.webm,.mov,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip">
         <label style="font-size:0.85rem; color:#555;">Descripcion (que muestra esta evidencia?)</label>
@@ -119,15 +122,21 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
     <?php else: ?>
     <div class="evid-grid">
         <?php while ($e = $evidencias->fetch_assoc()):
-            $url = "uploads/evidencias/" . rawurlencode($e['archivo']);
+            $url = evidencia_url($e['archivo'], $e['tipo']);
+            $url_segura = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
         ?>
-        <div class="evid">
-            <?php if ($e['tipo'] === 'Imagen'): ?>
-                <a href="<?php echo $url; ?>" target="_blank"><img src="<?php echo $url; ?>" alt="Evidencia"></a>
+        <div class="evid<?php echo $url === '' ? ' evid-faltante' : ''; ?>">
+            <?php if ($url === ''): ?>
+                <div class="evid-placeholder">
+                    <strong>Archivo no disponible</strong>
+                    <small>La evidencia está registrada, pero el archivo no está en el servidor.</small>
+                </div>
+            <?php elseif ($e['tipo'] === 'Imagen'): ?>
+                <a href="<?php echo $url_segura; ?>" target="_blank" rel="noopener"><img src="<?php echo $url_segura; ?>" alt="Evidencia" loading="lazy"></a>
             <?php elseif ($e['tipo'] === 'Video'): ?>
-                <video src="<?php echo $url; ?>" controls preload="metadata"></video>
+                <video src="<?php echo $url_segura; ?>" controls preload="metadata"></video>
             <?php else: ?>
-                <a class="doc" href="<?php echo $url; ?>" target="_blank"><?php echo htmlspecialchars($e['tipo']); ?><br>Abrir / descargar</a>
+                <a class="doc" href="<?php echo $url_segura; ?>" target="_blank" rel="noopener"><?php echo htmlspecialchars($e['tipo']); ?><br>Abrir / descargar</a>
             <?php endif; ?>
             <p><strong><?php echo htmlspecialchars($e['tipo']); ?></strong> - <?php echo date("d/m/Y H:i", strtotime($e['fecha_subida'])); ?></p>
             <?php if ($e['descripcion']): ?><p><?php echo nl2br(htmlspecialchars($e['descripcion'])); ?></p><?php endif; ?>

@@ -499,13 +499,84 @@ function institucion_resolver($conexion, $id_elegido, $nombre_nuevo) {
 
 
 // ---------- Archivos de evidencia ----------
-function borrar_archivo_evidencia($archivo) {
+// Convierte un valor de php.ini (10M, 512K, 1G) a bytes.
+function bytes_desde_ini($valor) {
+    $valor = trim((string)$valor);
+    if ($valor === '' || $valor === '-1') {
+        return 0;
+    }
+    $numero = (float)$valor;
+    switch (strtolower(substr($valor, -1))) {
+        case 'g':
+            $numero *= 1024;
+            // sin break: continua con megabytes
+        case 'm':
+            $numero *= 1024;
+            // sin break: continua con kilobytes
+        case 'k':
+            $numero *= 1024;
+            break;
+    }
+    return (int)$numero;
+}
+
+// Limite real para una evidencia: el menor entre el limite de PHP, el de la
+// peticion POST y el maximo propio de la aplicacion (20 MB).
+function evidencia_limite_bytes() {
+    $limites = [20 * 1024 * 1024];
+    foreach (['upload_max_filesize', 'post_max_size'] as $directiva) {
+        $bytes = bytes_desde_ini(ini_get($directiva));
+        if ($bytes > 0) {
+            // Se deja margen para los campos adicionales del formulario.
+            $limites[] = max(1024 * 1024, $bytes - (1024 * 1024));
+        }
+    }
+    return min($limites);
+}
+
+function evidencia_limite_mb() {
+    return max(1, (int)floor(evidencia_limite_bytes() / (1024 * 1024)));
+}
+
+// Devuelve la ruta fisica real del archivo, buscando tanto en la carpeta nueva
+// (uploads/evidencias) como en la antigua (evidencias).
+function evidencia_ruta_fisica($archivo) {
     $nombre = basename((string)$archivo);
+    if ($nombre === '' || $nombre === '.' || $nombre === '..') {
+        return null;
+    }
     foreach (["/uploads/evidencias/", "/evidencias/"] as $carpeta) {
         $ruta = dirname(__DIR__) . $carpeta . $nombre;
-        if (is_file($ruta)) {
-            @unlink($ruta);
+        if (is_file($ruta) && is_readable($ruta)) {
+            return $ruta;
         }
+    }
+    return null;
+}
+
+// Devuelve una URL valida solo si el archivo existe. Si es una imagen,
+// comprueba ademas que el contenido sea realmente una imagen.
+function evidencia_url($archivo, $tipo = null) {
+    $ruta = evidencia_ruta_fisica($archivo);
+    if ($ruta === null) {
+        return '';
+    }
+    if ($tipo === 'Imagen' && @getimagesize($ruta) === false) {
+        return '';
+    }
+
+    $ruta_normal = str_replace('\\', '/', $ruta);
+    $carpeta = strpos($ruta_normal, '/uploads/evidencias/') !== false
+        ? 'uploads/evidencias/'
+        : 'evidencias/';
+
+    return app_url($carpeta . rawurlencode(basename($ruta)));
+}
+
+function borrar_archivo_evidencia($archivo) {
+    $ruta = evidencia_ruta_fisica($archivo);
+    if ($ruta !== null) {
+        @unlink($ruta);
     }
 }
 
