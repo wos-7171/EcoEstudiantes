@@ -28,7 +28,7 @@ DIRECTORIOS_EXCLUIDOS = {
 
 NOMBRES_EXCLUIDOS = {
     ".DS_Store", "Thumbs.db", "desktop.ini", ".gitignore", ".gitattributes",
-    "config.local.php",
+    "config.local.php", "config.local.dev.php",
 }
 
 EXTENSIONES_EXCLUIDAS = {".log", ".tmp", ".cache", ".zip", ".bak", ".old", ".swp"}
@@ -87,7 +87,12 @@ def main() -> int:
     # Comprobaciones de seguridad del paquete.
     with zipfile.ZipFile(salida) as zf:
         nombres = set(zf.namelist())
-    prohibidos = [n for n in nombres if n.endswith("config.local.php") or ".git/" in n]
+    prohibidos = [
+        n for n in nombres
+        if n.endswith("config.local.php")
+        or n.endswith("config.local.dev.php")
+        or ".git/" in n
+    ]
     if prohibidos:
         salida.unlink(missing_ok=True)
         print("ERROR: el paquete contiene archivos prohibidos:", prohibidos, file=sys.stderr)

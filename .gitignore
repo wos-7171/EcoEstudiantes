@@ -14,8 +14,8 @@ node_modules/
 ~*
 
 # Configuración local con credenciales (no se versiona)
-config/config.local.php
-config/*.local.php
+config/*.local*.php
+!config/config.local.example.php
 
 # Copias de seguridad y paquetes de despliegue
 backups/

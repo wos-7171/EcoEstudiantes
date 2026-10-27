@@ -27,7 +27,7 @@
 </FilesMatch>
 
 # Archivos de configuración local con credenciales.
-<FilesMatch "^(config\.local\.php|.*\.local\.php|composer\.(json|lock)|package(-lock)?\.json)$">
+<FilesMatch "^(config\.local.*\.php|.*\.local\.php|composer\.(json|lock)|package(-lock)?\.json)$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

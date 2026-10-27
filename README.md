@@ -26,7 +26,7 @@ Plataforma para gestionar, hacer seguimiento y evaluar **Proyectos Ambientales E
    - `base_de_datos/datos_iniciales.sql` (roles, institución y administrador inicial).
 5. Abre `http://localhost/EcoEstudiantes/`.
 
-Si tu MySQL no usa `root` sin contraseña, copia `config/config.local.example.php` como `config/config.local.php` y ajusta los datos. Ese archivo está ignorado por Git.
+Si tu MySQL no usa `root` sin contraseña, copia `config/config.local.example.php` y ajusta los datos: en el PC usa `config/config.local.dev.php` (tiene prioridad); en el hosting usa `config/config.local.php`. Ambos están ignorados por Git y excluidos del paquete.
 
 ### Acceso inicial
 

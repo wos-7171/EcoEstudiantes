@@ -3,9 +3,10 @@
  * Configuración y conexión a la base de datos.
  *
  * Prioridad de configuración:
- *   1. config/config.local.php  (archivo local, ignorado por Git)
- *   2. Variables de entorno     (DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, APP_DEBUG)
- *   3. Valores por defecto de XAMPP (localhost / root / sin contraseña)
+ *   1. config/config.local.dev.php (solo desarrollo; tiene prioridad si existe)
+ *   2. config/config.local.php     (producción; ignorado por Git)
+ *   3. Variables de entorno        (DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, APP_DEBUG)
+ *   4. Valores por defecto de XAMPP (localhost / root / sin contraseña)
  *
  * Para InfinityFree crea config/config.local.php con los datos del panel:
  *
@@ -17,6 +18,10 @@
  *       'DB_NAME' => 'if0_00000000_ecoestudiantes',
  *       'APP_DEBUG' => false,
  *   ];
+ *
+ * En el PC de desarrollo, config/config.local.dev.php (si existe) permite
+ * seguir usando XAMPP sin tocar las credenciales de producción. Ese archivo
+ * nunca debe subirse al hosting.
  */
 
 date_default_timezone_set('America/Bogota');
@@ -26,11 +31,15 @@ if (!defined('ECO_ROOT')) {
 }
 
 $eco_config = [];
-$eco_config_file = __DIR__ . '/config.local.php';
-if (is_file($eco_config_file)) {
+// Se cargan en orden: producción primero y desarrollo después, de modo que
+// config.local.dev.php tiene la última palabra cuando existe.
+foreach ([__DIR__ . '/config.local.php', __DIR__ . '/config.local.dev.php'] as $eco_config_file) {
+    if (!is_file($eco_config_file)) {
+        continue;
+    }
     $eco_config_cargada = require $eco_config_file;
     if (is_array($eco_config_cargada)) {
-        $eco_config = $eco_config_cargada;
+        $eco_config = array_merge($eco_config, $eco_config_cargada);
     }
 }
 

@@ -33,10 +33,12 @@ foreach (['mysqli', 'mbstring', 'json', 'openssl'] as $extension) {
 }
 
 // Configuración local
-if (is_file($raiz . '/config/config.local.php')) {
-    linea('OK', 'config/config.local.php presente');
+if (is_file($raiz . '/config/config.local.dev.php')) {
+    linea('OK', 'config/config.local.dev.php presente (valores de desarrollo)');
+} elseif (is_file($raiz . '/config/config.local.php')) {
+    linea('OK', 'config/config.local.php presente (valores de producción)');
 } else {
-    $avisos[] = 'No existe config/config.local.php. Se usarán los valores por defecto de XAMPP.';
+    $avisos[] = 'No existe configuración local. Se usarán los valores por defecto de XAMPP.';
 }
 
 // Conexión y tablas

@@ -13,6 +13,7 @@ Esta guía deja el proyecto listo para publicarse en **InfinityFree** o en cualq
 | `.git/` | Expone todo el historial y la configuración del repositorio. |
 | `backups/` | Copias antiguas de código y datos. |
 | `config/config.local.php` | Contiene usuario y contraseña de la base de datos. |
+| `config/config.local.dev.php` | Credenciales de XAMPP para desarrollo; no debe llegar al hosting. |
 | Volcados SQL con datos reales | Contienen correos, nombres y hashes de contraseñas. |
 | `uploads/evidencias/*` y `evidencias/*` | Fotos subidas por estudiantes (datos personales). |
 | `dist/` | Paquetes generados. |
@@ -114,6 +115,7 @@ return [
 
 - `config.local.php` está ignorado por Git y bloqueado por `.htaccess`.
 - No pongas `APP_DEBUG => true` en producción.
+- Si también desarrollas en este equipo, crea `config/config.local.dev.php` con los datos de XAMPP. Ese archivo tiene prioridad local y **no debe subirse** al hosting.
 
 ### 3.5. Importar la base de datos
 
