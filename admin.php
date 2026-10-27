@@ -54,8 +54,17 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
 
 <div class="container">
     <h1>Panel de Administración - EcoEstudiantes</h1>
-    <p>Sesión activa: <strong><?php echo htmlspecialchars($_SESSION["nombre"]); ?></strong> (<?php echo htmlspecialchars($_SESSION["rol"]); ?>)
-        | <a href="logout.php" style="color: #d32f2f;">Cerrar Sesión</a></p>
+
+    <div class="admin-bienvenida">
+        <div>
+            <p class="admin-saludo">¡Bienvenido(a), <strong><?php echo htmlspecialchars($_SESSION["nombre"]); ?></strong>!</p>
+            <p class="admin-rol">Has iniciado sesión como <strong><?php echo htmlspecialchars($_SESSION["rol"]); ?></strong>.</p>
+        </div>
+        <form action="logout.php" method="POST" class="admin-logout-form">
+<?php echo csrf_campo(); ?>
+            <button type="submit" class="admin-logout-btn">Cerrar sesión</button>
+        </form>
+    </div>
 
     <?php flash_mostrar(); ?>
 

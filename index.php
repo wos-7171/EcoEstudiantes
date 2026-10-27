@@ -92,7 +92,7 @@ $lista_instituciones = $conexion->query("SELECT id_institucion, nombre FROM inst
 
                 <form id="registerForm" action="registro_usuario.php" method="POST">
 <?php echo csrf_campo(); ?>
-                    <div class="hp-field" aria-hidden="true">
+                    <div class="hp-field" aria-hidden="true" style="position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important;">
                         <label for="regSitioWeb">No rellenar</label>
                         <input type="text" id="regSitioWeb" name="sitio_web" tabindex="-1" autocomplete="off">
                     </div>

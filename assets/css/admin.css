@@ -1,21 +1,82 @@
 body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f8; min-height: 100vh; display: flex; flex-direction: column; }
         .container { max-width: 1100px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        footer .container { background: transparent; padding: 0; border-radius: 0; box-shadow: none; max-width: 1100px; }
         h1 { color: #2e7d32; }
         h2 { color: #333; margin-top: 30px; border-bottom: 2px solid #2e7d32; padding-bottom: 5px; scroll-margin-top: 16px; }
-footer { background:#111; color:#fff; text-align:center; padding:20px 10px; margin-top:auto; }
-footer p { margin-bottom:15px; }
-.social-links { display:flex; justify-content:center; gap:15px; }
-.social-links a { display:inline-flex; align-items:center; justify-content:center; border-radius:50%; width:40px; height:40px; }
-.social-links img { width:22px; height:22px; filter:brightness(0) invert(1); }
-.pie-instituciones { display:flex; justify-content:center; align-items:center; gap:16px; margin-top:14px; }
-.pie-instituciones a { display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; background:#fff; line-height:0; overflow:hidden; }
-.pie-instituciones img { width:38px; height:38px; max-width:38px; object-fit:contain; filter:none; }
-.social-links a[href*="facebook"] { background:#1877F2; }
-.social-links a[href*="instagram"] { background:#d6249f; }
-.social-links a[href*="x.com"] { background:#000; }
-.social-links a[href*="youtube"] { background:#FF0000; }
-.social-links a[href*="tiktok"] { background:#000; }
+
+        /* Bienvenida y cierre de sesión */
+        .admin-bienvenida {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 12px 0 18px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%);
+            border: 2px solid rgba(46, 125, 50, 0.25);
+            border-left: 6px solid #2e7d32;
+            border-radius: 8px;
+        }
+        .admin-bienvenida p { margin: 0; }
+        .admin-saludo { color: #1b5e20; font-size: 1.1rem; }
+        .admin-rol { color: #555; font-size: 0.9rem; }
+        .admin-logout-form { background: none; border: none; padding: 0; margin: 0; display: inline-block; }
+        .admin-bienvenida .admin-logout-btn {
+            width: auto;
+            margin: 0;
+            padding: 9px 18px;
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .admin-bienvenida .admin-logout-btn:hover { background: #b71c1c; }
+
+        /* Pie de página igual al del resto del sitio */
+        footer {
+            background: #111;
+            color: #fff;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+        footer .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        footer p { margin-bottom: 0; font-size: 14px; }
+        .social-links { display: flex; justify-content: center; gap: 15px; }
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .social-links a:hover { transform: scale(1.1); }
+        .social-links img { width: 22px; height: 22px; filter: brightness(0) invert(1); }
+        .pie-instituciones { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 0; }
+        .pie-instituciones a { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: #fff; line-height: 0; overflow: hidden; }
+        .pie-instituciones img { width: 38px; height: 38px; max-width: 38px; object-fit: contain; filter: none; }
+        .social-links a[href*="facebook"] { background: #1877F2; }
+        .social-links a[href*="instagram"] { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .social-links a[href*="x.com"] { background: #000; }
+        .social-links a[href*="youtube"] { background: #FF0000; }
+        .social-links a[href*="tiktok"] { background: #000; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; }
         table, th, td { border: 1px solid #ddd; }
         th, td { padding: 10px; text-align: left; vertical-align: middle; }

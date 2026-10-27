@@ -73,7 +73,7 @@ $correo_prefill = $_SESSION["correo"] ?? "";
                 <?php if ($flash_error): ?><div class="aviso aviso-error"><?php echo htmlspecialchars($flash_error); ?></div><?php endif; ?>
                 <form class="form-contacto" action="contacto_acciones.php" method="POST">
 <?php echo csrf_campo(); ?>
-                    <div class="hp-field" aria-hidden="true">
+                    <div class="hp-field" aria-hidden="true" style="position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important;">
                         <label for="c_sitio_web">No rellenar</label>
                         <input type="text" id="c_sitio_web" name="sitio_web" tabindex="-1" autocomplete="off">
                     </div>

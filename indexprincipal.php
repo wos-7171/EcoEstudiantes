@@ -2,7 +2,11 @@
 require_once __DIR__ . '/includes/bootstrap.php';
 
 $usuario_actual = usuario_verificar_activo($conexion, null, true);
-$rol = $_SESSION["rol"]; // 'Administrador' | 'Docente' | 'Estudiante'
+$rol = trim((string)($_SESSION["rol"] ?? '')); // 'Administrador' | 'Docente' | 'Estudiante'
+
+$nombre_sesion = trim((string)($usuario_actual['nombre'] ?? $_SESSION['nombre'] ?? ''));
+$partes_nombre = $nombre_sesion !== '' ? preg_split('/\s+/', $nombre_sesion) : [];
+$primer_nombre = $partes_nombre[0] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,6 +25,16 @@ $rol = $_SESSION["rol"]; // 'Administrador' | 'Docente' | 'Estudiante'
 <?php include("incluir_nav.php"); ?>
 
 <main>
+    <section class="bienvenida" aria-label="Mensaje de bienvenida">
+        <div class="container">
+            <div class="bienvenida-card">
+                <h1>¡Bienvenido(a), <?php echo htmlspecialchars($primer_nombre !== '' ? $primer_nombre : 'estudiante'); ?>!</h1>
+                <p>Nos alegra tenerte de vuelta. Explora los proyectos, actividades y recursos disponibles para tu institución.</p>
+                <span class="bienvenida-rol">Sesión iniciada como <?php echo htmlspecialchars($rol !== '' ? $rol : 'usuario'); ?></span>
+            </div>
+        </div>
+    </section>
+
     <section class="hero">
         <div class="container">
             <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Estudiantes trabajando en proyecto ecológico" class="hero-image">
