@@ -40,15 +40,19 @@ $res_galeria = $conexion->query("SELECT id_foto, titulo, archivo, fecha_subida F
 // Instituciones (para el resumen)
 $res_instituciones = $conexion->query("SELECT COUNT(*) AS n FROM instituciones");
 $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
+
+$version_style = (int)@filemtime(__DIR__ . '/assets/css/style.css');
+$version_motion = (int)@filemtime(__DIR__ . '/assets/css/motion.css');
+$version_admin = (int)@filemtime(__DIR__ . '/assets/css/admin.css');
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Panel de Administración - EcoEstudiantes</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/motion.css">
-    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo $version_style; ?>">
+    <link rel="stylesheet" href="assets/css/motion.css?v=<?php echo $version_motion; ?>">
+    <link rel="stylesheet" href="assets/css/admin.css?v=<?php echo $version_admin; ?>">
 </head>
 <body>
 

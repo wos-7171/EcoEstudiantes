@@ -14,6 +14,12 @@ if (!empty($_SESSION['id_usuario'])) {
         sesion_iniciar();
     }
 }
+
+// Fuerza la actualizacion de CSS/JS cuando cambian los archivos.
+$version_style  = (int)@filemtime(__DIR__ . '/assets/css/style.css');
+$version_motion = (int)@filemtime(__DIR__ . '/assets/css/motion.css');
+$version_script = (int)@filemtime(__DIR__ . '/assets/js/script.js');
+$version_js_motion = (int)@filemtime(__DIR__ . '/assets/js/motion.js');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -22,8 +28,8 @@ if (!empty($_SESSION['id_usuario'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión / Registro</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/motion.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo $version_style; ?>">
+    <link rel="stylesheet" href="assets/css/motion.css?v=<?php echo $version_motion; ?>">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 </head>
 
@@ -117,7 +123,7 @@ $lista_instituciones = $conexion->query("SELECT id_institucion, nombre FROM inst
 
                     <div class="form-group">
                         <label for="regInstitucion">Institucion educativa</label>
-                        <select id="regInstitucion" name="id_institucion">
+                        <select id="regInstitucion" name="id_institucion" class="form-select">
                             <option value="">Elige una de la lista</option>
                             <?php if ($lista_instituciones): while ($inst = $lista_instituciones->fetch_assoc()): ?>
                             <option value="<?php echo (int)$inst['id_institucion']; ?>"><?php echo htmlspecialchars($inst['nombre']); ?></option>
@@ -169,8 +175,8 @@ $lista_instituciones = $conexion->query("SELECT id_institucion, nombre FROM inst
 
     </div>
 
-    <script src="assets/js/script.js"></script>
-    <script src="assets/js/motion.js"></script>
+    <script src="assets/js/script.js?v=<?php echo $version_script; ?>"></script>
+    <script src="assets/js/motion.js?v=<?php echo $version_js_motion; ?>"></script>
 </body>
 
 </html>

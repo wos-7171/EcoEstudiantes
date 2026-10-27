@@ -7,6 +7,8 @@ $rol = trim((string)($_SESSION["rol"] ?? '')); // 'Administrador' | 'Docente' | 
 $nombre_sesion = trim((string)($usuario_actual['nombre'] ?? $_SESSION['nombre'] ?? ''));
 $partes_nombre = $nombre_sesion !== '' ? preg_split('/\s+/', $nombre_sesion) : [];
 $primer_nombre = $partes_nombre[0] ?? '';
+
+$version_styles = (int)@filemtime(__DIR__ . '/assets/css/styles.css');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -18,7 +20,7 @@ $primer_nombre = $partes_nombre[0] ?? '';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=<?php echo $version_styles; ?>">
 </head>
 
 <body>
