@@ -1,0 +1,25 @@
+# Normaliza los finales de línea a LF para evitar diffs completos por CRLF.
+* text=auto eol=lf
+
+*.php   text eol=lf
+*.phtml text eol=lf
+*.css   text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.sql   text eol=lf
+*.html  text eol=lf
+*.htaccess text eol=lf
+
+# Archivos binarios
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary

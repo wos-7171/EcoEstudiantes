@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $usuario_actual = usuario_verificar_activo($conexion, null, true);
 $rol = $_SESSION["rol"] ?? "";

@@ -93,12 +93,16 @@ $rol = trim((string)$rol);
             </div>
             <?php endif; ?>
 
-            <a
-                href="<?php echo htmlspecialchars($prefix); ?>logout.php"
-                class="logout-btn"
+            <form
+                action="<?php echo htmlspecialchars($prefix); ?>logout.php"
+                method="POST"
+                class="logout-form"
             >
-                Cerrar sesión
-            </a>
+                <?php echo csrf_campo(); ?>
+                <button type="submit" class="logout-btn">
+                    Cerrar sesión
+                </button>
+            </form>
 
         </div>
 

@@ -1,17 +1,13 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-// Verificacion de seguridad: solo el Administrador, y solo por POST
-if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador') {
-    header("Location: index.php");
-    exit();
-}
+// Solo el Administrador, solo por POST y con token CSRF válido.
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: admin.php");
+    header('Location: ' . app_url('admin.php'));
     exit();
 }
+$usuario_actual = requiere_usuario($conexion, 'Administrador', 'indexprincipal.php');
+csrf_exigir();
 
 $id_yo = (int)$_SESSION["id_usuario"];
 $accion = $_POST['accion'] ?? '';

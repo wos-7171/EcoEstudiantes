@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $usuario_actual = usuario_verificar_activo($conexion, null, true);
 
@@ -59,6 +57,7 @@ if ($rol === 'Administrador') {
     <?php if ($puede_crear): ?>
     <h2>Crear nuevo proyecto</h2>
     <form class="crear" action="proyectos_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="crear">
         <input type="text" name="nombre" placeholder="Nombre del proyecto" maxlength="150" required>
         <textarea name="descripcion" placeholder="Descripción" rows="3"></textarea>
@@ -115,6 +114,7 @@ if ($rol === 'Administrador') {
             <?php if ($rol === 'Administrador' || $es_dueno): ?>
                 <form action="proyectos_acciones.php" method="POST" class="form-inline"
                       onsubmit="return confirm('¿Eliminar este proyecto? También se borrarán sus actividades, inscripciones y evidencias.')">
+<?php echo csrf_campo(); ?>
                     <input type="hidden" name="accion" value="eliminar">
                     <input type="hidden" name="id" value="<?php echo (int)$p['id_proyecto']; ?>">
                     <button type="submit" class="link-del" title="Eliminar proyecto">Eliminar</button>
@@ -134,6 +134,7 @@ if ($rol === 'Administrador') {
 
             <?php if ($rol === 'Administrador' || $es_dueno): ?>
             <form action="proyectos_acciones.php" method="POST" style="margin-top:10px;">
+<?php echo csrf_campo(); ?>
                 <input type="hidden" name="accion" value="cambiar_estado">
                 <input type="hidden" name="id_proyecto" value="<?php echo $p['id_proyecto']; ?>">
                 <select name="estado" onchange="this.form.submit()">

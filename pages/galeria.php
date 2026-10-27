@@ -1,10 +1,7 @@
 <?php
-session_start();
-include("../conexion.php");
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: ../index.php");
-    exit();
-}
+require_once __DIR__ . '/../includes/bootstrap.php';
+
+$usuario_actual = requiere_usuario($conexion, null, 'indexprincipal.php');
 $rol = $_SESSION["rol"];
 $prefix = "../";
 $fotos = $conexion->query("SELECT titulo, archivo FROM galeria ORDER BY fecha_subida DESC");

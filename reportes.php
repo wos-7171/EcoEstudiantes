@@ -1,21 +1,10 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
-    exit();
-}
+$usuario_actual = requiere_usuario($conexion, ['Administrador', 'Docente'], 'mis_actividades.php');
 
-$id_usuario = $_SESSION["id_usuario"];
+$id_usuario = (int)$_SESSION["id_usuario"];
 $rol = $_SESSION["rol"];
-
-// Solo Administrador y Docente ven reportes
-if ($rol !== 'Administrador' && $rol !== 'Docente') {
-    header("Location: mis_actividades.php");
-    exit();
-}
 
 // Administrador ve todo; Docente solo lo de los proyectos de los que es responsable
 $es_admin = ($rol === 'Administrador');

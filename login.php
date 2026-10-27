@@ -1,17 +1,42 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-include("conexion.php");
+/**
+ * Inicio de sesión.
+ *
+ * - Solo acepta POST con token CSRF válido.
+ * - Limita los intentos fallidos por IP + correo (5 intentos / 15 minutos).
+ * - No revela si el correo existe o está desactivado.
+ * - Regenera el ID de sesión y el token CSRF al autenticar.
+ */
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: index.php");
+require_once __DIR__ . '/includes/bootstrap.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ' . app_url('index.php'));
     exit();
 }
 
-$correo = isset($_POST['correo']) ? trim($_POST['correo']) : '';
-$contrasena = isset($_POST['contrasena']) ? $_POST['contrasena'] : ''; // no se recorta: el registro tampoco la recorta
+csrf_exigir();
 
-// Consulta preparada: trae al usuario junto con el nombre de su rol
+$correo = trim((string)($_POST['correo'] ?? ''));
+$contrasena = (string)($_POST['contrasena'] ?? '');
+
+if ($correo === '' || $contrasena === '') {
+    flash_error('Escribe tu correo y tu contraseña.');
+    header('Location: ' . app_url('index.php'));
+    exit();
+}
+
+// Bloqueo temporal tras varios intentos fallidos (por correo y por IP).
+$bloqueo = login_intentos_estado($conexion, $correo);
+$bloqueo_ip = login_intentos_estado($conexion, '__ip__');
+if ($bloqueo['bloqueado'] || $bloqueo_ip['bloqueado']) {
+    $minutos = max((int)$bloqueo['minutos'], (int)$bloqueo_ip['minutos'], 1);
+    flash_error('Demasiados intentos fallidos. Espera ' . $minutos . ' minuto(s) e inténtalo de nuevo.');
+    header('Location: ' . app_url('index.php'));
+    exit();
+}
+
+// Consulta preparada: trae al usuario junto con el nombre de su rol.
 $sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.password,
                u.id_rol, r.nombre AS rol_nombre, u.estado
         FROM usuarios u
@@ -23,45 +48,54 @@ $stmt = $conexion->prepare($sql);
 $stmt->bind_param("s", $correo);
 $stmt->execute();
 $resultado = $stmt->get_result();
+$usuario = ($resultado && $resultado->num_rows > 0) ? $resultado->fetch_assoc() : null;
+$stmt->close();
 
-if ($resultado && $resultado->num_rows > 0) {
-    $usuario = $resultado->fetch_assoc();
+// Se verifica siempre un hash (real o de relleno) para no filtrar por tiempos.
+$hash = $usuario['password'] ?? '$2y$10$LVw6WprbsmY2qCTHv4XBoesJg0ZTqNXpmZ9bgFQV8gs23ednpaEXS';
+$clave_correcta = password_verify($contrasena, $hash);
 
-    if ((int)$usuario["estado"] !== 1) {
-        $stmt->close();
-        $conexion->close();
-        echo "<script>alert('Tu cuenta esta desactivada. Contacta al administrador.'); window.location.href='index.php';</script>";
-        exit();
-    }
-
-    // Verifica la contraseña contra el hash guardado (bcrypt)
-    if (password_verify($contrasena, $usuario["password"])) {
-
-        session_regenerate_id(true); // evita fijacion de sesion
-        $_SESSION["id_usuario"]    = (int)$usuario["id_usuario"];
-        $_SESSION["nombre"]        = $usuario["nombre"] . " " . $usuario["apellido"];
-        $_SESSION["correo"]        = $usuario["correo"];
-        $_SESSION["id_rol"]        = (int)$usuario["id_rol"];
-        $_SESSION["rol"]           = $usuario["rol_nombre"]; // 'Administrador' | 'Docente' | 'Estudiante'
-        $_SESSION["ultimo_acceso"] = time();
-        $_SESSION["csrf_token"]    = bin2hex(random_bytes(32));
-
-        $stmt->close();
-        $conexion->close();
-
-        if ($usuario["rol_nombre"] === "Administrador") {
-            header("Location: admin.php");
-        } else {
-            header("Location: indexprincipal.php");
-        }
-        exit();
-    } else {
-        echo "<script>alert('Correo o contraseña incorrectos'); window.location.href='index.php';</script>";
-    }
-} else {
-    echo "<script>alert('Correo o contraseña incorrectos'); window.location.href='index.php';</script>";
+if (!$usuario || !$clave_correcta) {
+    login_intentos_fallo($conexion, $correo);
+    login_intentos_fallo($conexion, '__ip__', 20, 15);
+    flash_error('Correo o contraseña incorrectos.');
+    header('Location: ' . app_url('index.php'));
+    exit();
 }
 
-$stmt->close();
-$conexion->close();
-?>
+// La cuenta existe y la contraseña es correcta, pero está desactivada.
+if ((int)$usuario['estado'] !== 1) {
+    flash_error('Tu cuenta está desactivada. Contacta al administrador.');
+    header('Location: ' . app_url('index.php'));
+    exit();
+}
+
+login_intentos_limpiar($conexion, $correo);
+
+// Actualiza el hash si el algoritmo por defecto cambia en el futuro.
+if (password_needs_rehash($usuario['password'], PASSWORD_BCRYPT)) {
+    $nuevo_hash = password_hash($contrasena, PASSWORD_BCRYPT);
+    if ($nuevo_hash !== false) {
+        $upd = $conexion->prepare("UPDATE usuarios SET password = ? WHERE id_usuario = ?");
+        if ($upd) {
+            $id = (int)$usuario['id_usuario'];
+            $upd->bind_param("si", $nuevo_hash, $id);
+            $upd->execute();
+            $upd->close();
+        }
+    }
+}
+
+// Evita fijación de sesión y renueva el token CSRF.
+session_regenerate_id(true);
+$_SESSION['id_usuario'] = (int)$usuario['id_usuario'];
+$_SESSION['nombre'] = $usuario['nombre'] . ' ' . $usuario['apellido'];
+$_SESSION['correo'] = $usuario['correo'];
+$_SESSION['id_rol'] = (int)$usuario['id_rol'];
+$_SESSION['rol'] = $usuario['rol_nombre'];
+$_SESSION['ultimo_acceso'] = time();
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+$destino = ($usuario['rol_nombre'] === 'Administrador') ? 'admin.php' : 'indexprincipal.php';
+header('Location: ' . app_url($destino));
+exit();

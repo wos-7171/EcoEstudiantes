@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 // Solo el administrador lee los mensajes de contacto
 $usuario_actual = usuario_verificar_activo($conexion, 'Administrador', true);
@@ -48,6 +46,7 @@ $res = $conexion->query(
             </div>
         <?php endif; ?>
         <form action="mensajes_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
             <input type="hidden" name="accion" value="responder">
             <input type="hidden" name="id_mensaje" value="<?php echo (int)$m['id_mensaje']; ?>">
             <label for="resp<?php echo (int)$m['id_mensaje']; ?>">Responder al usuario</label>
@@ -57,6 +56,7 @@ $res = $conexion->query(
         <div class="acciones-fila">
             <?php foreach (['Leído', 'Respondido', 'Archivado'] as $nuevo): if ($m['estado'] !== $nuevo): ?>
             <form action="mensajes_acciones.php" method="POST" style="display:inline;">
+<?php echo csrf_campo(); ?>
                 <input type="hidden" name="accion" value="estado">
                 <input type="hidden" name="id_mensaje" value="<?php echo (int)$m['id_mensaje']; ?>">
                 <input type="hidden" name="estado" value="<?php echo $nuevo; ?>">
@@ -64,6 +64,7 @@ $res = $conexion->query(
             </form>
             <?php endif; endforeach; ?>
             <form action="mensajes_acciones.php" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este mensaje?');">
+<?php echo csrf_campo(); ?>
                 <input type="hidden" name="accion" value="eliminar">
                 <input type="hidden" name="id_mensaje" value="<?php echo (int)$m['id_mensaje']; ?>">
                 <button type="submit" class="btn-danger">Eliminar</button>

@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 // Verificar sesión y rol de administrador
 $usuario_actual = usuario_verificar_activo($conexion, 'Administrador', true);
@@ -83,6 +81,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
 
     <h3>Crear Nuevo Usuario</h3>
     <form action="admin_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="crear_usuario">
         <input type="text" name="nombre" placeholder="Nombres" maxlength="80" required>
         <input type="text" name="apellido" placeholder="Apellidos" maxlength="80" required>
@@ -126,11 +125,13 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                     <?php else: ?>
                     <a class="link link-edit" href="admin_usuario_editar.php?id=<?php echo (int)$u['id_usuario']; ?>">Editar</a>
                     <form action="admin_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="cambiar_estado_usuario">
                         <input type="hidden" name="id" value="<?php echo (int)$u['id_usuario']; ?>">
                         <button type="submit" class="link link-est"><?php echo $u['estado'] ? 'Desactivar' : 'Activar'; ?></button>
                     </form>
                     <form action="admin_acciones.php" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario? Se borrarán también sus inscripciones y evidencias.')">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="eliminar_usuario">
                         <input type="hidden" name="id" value="<?php echo (int)$u['id_usuario']; ?>">
                         <button type="submit" class="link link-del">Eliminar</button>
@@ -147,6 +148,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
 
     <h3>Publicar Nueva Noticia</h3>
     <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="crear_noticia">
         <input type="text" name="titulo" placeholder="Título de la noticia" maxlength="200" required>
         <textarea name="contenido" placeholder="Escribe aquí el contenido de la noticia..." rows="5" required></textarea>
@@ -174,6 +176,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                 <td><?php echo (int)$n['num_imagenes']; ?></td>
                 <td>
                     <form action="admin_acciones.php" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta noticia?')">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="eliminar_noticia">
                         <input type="hidden" name="id" value="<?php echo (int)$n['id_noticia']; ?>">
                         <button type="submit" class="link link-del">Eliminar</button>
@@ -186,6 +189,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
 
     <h2 id="galeria">Galeria</h2>
     <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="subir_galeria">
         <input type="text" name="titulo" placeholder="Titulo de la foto" maxlength="120" required>
         <input type="file" name="foto" accept="image/jpeg,image/png,image/webp,image/gif" required>
@@ -205,6 +209,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                 <td><?php echo date("d/m/Y", strtotime($g['fecha_subida'])); ?></td>
                 <td>
                     <form action="admin_acciones.php" method="POST" enctype="multipart/form-data">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="editar_galeria">
                         <input type="hidden" name="id" value="<?php echo (int)$g['id_foto']; ?>">
                         <input type="text" name="titulo" value="<?php echo htmlspecialchars($g['titulo']); ?>" maxlength="120" required>
@@ -212,6 +217,7 @@ $n_instituciones = (int)$res_instituciones->fetch_assoc()['n'];
                         <button type="submit" class="link link-edit">Guardar</button>
                     </form>
                     <form action="admin_acciones.php" method="POST" onsubmit="return confirm('¿Quitar esta foto de la galeria?');">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="eliminar_galeria">
                         <input type="hidden" name="id" value="<?php echo (int)$g['id_foto']; ?>">
                         <button type="submit" class="link link-del">Quitar</button>

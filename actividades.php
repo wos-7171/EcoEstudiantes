@@ -1,14 +1,9 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
-    exit();
-}
+$usuario_actual = requiere_usuario($conexion, null, 'indexprincipal.php');
 
-$id_usuario = $_SESSION["id_usuario"];
+$id_usuario = (int)$_SESSION["id_usuario"];
 $rol = $_SESSION["rol"];
 
 $id_proyecto = isset($_GET['id_proyecto']) ? intval($_GET['id_proyecto']) : 0;
@@ -99,6 +94,7 @@ if ($rol === 'Estudiante') {
     <?php if ($puede_crear): ?>
     <h2>Registrar nueva actividad</h2>
     <form class="crear" action="actividades_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="crear">
         <input type="hidden" name="id_proyecto" value="<?php echo $id_proyecto; ?>">
         <input type="text" name="nombre" placeholder="Nombre de la actividad (ej: Jornada de reciclaje)" maxlength="150" required>
@@ -125,6 +121,7 @@ if ($rol === 'Estudiante') {
         <?php if ($puede_crear): ?>
             <form action="actividades_acciones.php" method="POST" class="form-inline"
                   onsubmit="return confirm('¿Eliminar esta actividad? También se borrarán sus inscripciones y evidencias.')">
+<?php echo csrf_campo(); ?>
                 <input type="hidden" name="accion" value="eliminar">
                 <input type="hidden" name="id_actividad" value="<?php echo (int)$a['id_actividad']; ?>">
                 <button type="submit" class="link-del" title="Eliminar actividad">Eliminar</button>
@@ -139,6 +136,7 @@ if ($rol === 'Estudiante') {
         <div class="acciones-fila">
             <?php if ($puede_crear): ?>
                 <form action="actividades_acciones.php" method="POST" style="display:inline;">
+<?php echo csrf_campo(); ?>
                     <input type="hidden" name="accion" value="cambiar_estado">
                     <input type="hidden" name="id_actividad" value="<?php echo $a['id_actividad']; ?>">
                     <input type="hidden" name="id_proyecto" value="<?php echo $id_proyecto; ?>">
@@ -156,6 +154,7 @@ if ($rol === 'Estudiante') {
                 <?php if ($mi_insc === null): ?>
                     <?php if (in_array($a['estado'], ['Programada', 'En ejecución'], true)): ?>
                     <form action="actividades_acciones.php" method="POST" style="display:inline;">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="inscribirse">
                         <input type="hidden" name="id_actividad" value="<?php echo $a['id_actividad']; ?>">
                         <input type="hidden" name="id_proyecto" value="<?php echo $id_proyecto; ?>">
@@ -177,6 +176,7 @@ if ($rol === 'Estudiante') {
                     <?php if ($mi_insc['estado'] === 'Inscrito'): ?>
                     <form action="actividades_acciones.php" method="POST" style="display:inline;"
                           onsubmit="return confirm('¿Cancelar tu inscripción en esta actividad?')">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="desinscribirse">
                         <input type="hidden" name="id_actividad" value="<?php echo $a['id_actividad']; ?>">
                         <button type="submit" style="background:#9e9e9e;">Cancelar inscripción</button>

@@ -60,3 +60,13 @@ button.link-del:hover { background: none; text-decoration: underline; }
     .app-section { box-shadow: none; margin: 0; max-width: 100%; }
     .chart-box { break-inside: avoid; }
 }
+
+/* Campo honeypot invisible para bots */
+.hp-field {
+    position: absolute !important;
+    left: -10000px !important;
+    top: auto !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+}

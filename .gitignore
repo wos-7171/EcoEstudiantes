@@ -12,3 +12,28 @@ node_modules/
 .vscode/
 *.zip
 ~*
+
+# Configuración local con credenciales (no se versiona)
+config/config.local.php
+config/*.local.php
+
+# Copias de seguridad y paquetes de despliegue
+backups/
+dist/
+*.bak
+*.old
+
+# Volcados SQL: solo se versionan el esquema y los datos iniciales
+*.sql
+!base_de_datos/esquema.sql
+!base_de_datos/datos_iniciales.sql
+
+# Archivos subidos por usuarios (se conservan las reglas .htaccess)
+uploads/evidencias/*
+!uploads/evidencias/.htaccess
+!uploads/evidencias/index.html
+evidencias/*
+!evidencias/index.html
+images/noticias/*
+!images/noticias/.htaccess
+!images/noticias/index.html

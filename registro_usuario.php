@@ -1,16 +1,27 @@
 <?php
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
 // Muestra un aviso y vuelve al formulario
-function aviso_y_volver($mensaje) {
-    echo "<script>alert(" . json_encode($mensaje, JSON_UNESCAPED_UNICODE) . "); window.location.href = 'index.php';</script>";
+function aviso_y_volver($mensaje, $tipo = 'error') {
+    if ($tipo === 'ok') {
+        flash_ok($mensaje);
+    } else {
+        flash_error($mensaje);
+    }
+    header('Location: ' . app_url('index.php'));
     exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: index.php");
+    header('Location: ' . app_url('index.php'));
     exit();
+}
+
+csrf_exigir();
+
+// Honeypot: los bots suelen rellenar campos ocultos.
+if (trim((string)($_POST['sitio_web'] ?? '')) !== '') {
+    aviso_y_volver('No se pudo completar el registro. Inténtalo de nuevo.');
 }
 
 $nombre = trim($_POST["nombre"] ?? '');
@@ -68,7 +79,7 @@ try {
     $stmt->execute();
     $stmt->close();
     $conexion->close();
-    aviso_y_volver('¡Registro exitoso! Ahora puedes iniciar sesion.');
+    aviso_y_volver('¡Registro exitoso! Ahora puedes iniciar sesión.', 'ok');
 } catch (Throwable $e) {
     aviso_y_volver('Error al registrar usuario. Intenta de nuevo.');
 }

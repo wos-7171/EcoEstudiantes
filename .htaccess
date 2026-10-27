@@ -1,0 +1,48 @@
+# ============================================================
+# EcoEstudiantes Digitales - configuración de seguridad Apache
+# Compatible con XAMPP y con hosting compartido (InfinityFree).
+# No se usan directivas Options ni php_flag para evitar errores 500.
+# ============================================================
+
+# Evita el listado de directorios incluso si el servidor tiene Indexes activo.
+<IfModule mod_autoindex.c>
+    IndexIgnore *
+</IfModule>
+
+# Bloquea carpetas de control de versiones y entornos virtuales.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (^|/)\.(git|svn|hg|bzr|env)(/|$) - [F,L,NC]
+</IfModule>
+
+# Bloquea archivos sensibles dentro de todo el árbol del proyecto.
+<FilesMatch "(^\.|\.(sql|md|markdown|log|bak|backup|old|orig|save|swp|ini|env|dist|sh|bat|ps1)$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Archivos de configuración local con credenciales.
+<FilesMatch "^(config\.local\.php|.*\.local\.php|composer\.(json|lock)|package(-lock)?\.json)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Cabeceras de seguridad también para recursos estáticos.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Página de inicio por defecto.
+DirectoryIndex index.php index.html

@@ -1,9 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: ../index.php");
-    exit();
-}
+require_once __DIR__ . '/../includes/bootstrap.php';
+
+$usuario_actual = requiere_usuario($conexion, null, 'indexprincipal.php');
 $rol = $_SESSION["rol"];
 $prefix = "../";
 
@@ -40,7 +38,7 @@ $correo_prefill = $_SESSION["correo"] ?? "";
                             <div class="contact-item">
                                 <div>
                                     <h3>Dirección</h3>
-                                    <p>6801 Hollywood Blvd, Los Angeles, CA 90028, USA</p>
+                                    <p>Medellín, Antioquia, Colombia</p>
                                 </div>
                             </div>
 
@@ -62,8 +60,8 @@ $correo_prefill = $_SESSION["correo"] ?? "";
                     <div>
                         <div class="map-container">
                             <h3>Ubicación</h3>
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d423283.435550234!2d-118.69191575!3d34.02073034999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2c75ddc27da13%3A0xe22fdf6f254608f4!2sLos%20%C3%81ngeles%2C%20California%2C%20EE.%20UU.!5e0!3m2!1ses!2ses!4v1684869686783!5m2!1ses!2ses"
-                                width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <iframe src="https://www.google.com/maps?q=Medell%C3%ADn,+Antioquia,+Colombia&output=embed"
+                                width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación en Medellín, Colombia"></iframe>
                         </div>
                     </div>
                 </div>
@@ -74,6 +72,11 @@ $correo_prefill = $_SESSION["correo"] ?? "";
                 <?php if ($flash_ok): ?><div class="aviso aviso-ok"><?php echo htmlspecialchars($flash_ok); ?></div><?php endif; ?>
                 <?php if ($flash_error): ?><div class="aviso aviso-error"><?php echo htmlspecialchars($flash_error); ?></div><?php endif; ?>
                 <form class="form-contacto" action="contacto_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="c_sitio_web">No rellenar</label>
+                        <input type="text" id="c_sitio_web" name="sitio_web" tabindex="-1" autocomplete="off">
+                    </div>
                     <label for="c_nombre">Nombre</label>
                     <input type="text" id="c_nombre" name="nombre" maxlength="100" required value="<?php echo htmlspecialchars($nombre_prefill); ?>">
                     <label for="c_correo">Correo electrónico</label>

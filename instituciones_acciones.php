@@ -1,12 +1,12 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"]) || $_SESSION["rol"] !== 'Administrador' || $_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: index.php");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header('Location: ' . app_url('instituciones.php'));
     exit();
 }
+$usuario_actual = requiere_usuario($conexion, 'Administrador', 'indexprincipal.php');
+csrf_exigir();
 
 $accion = $_POST['accion'] ?? '';
 

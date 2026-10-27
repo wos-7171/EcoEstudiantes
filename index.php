@@ -1,3 +1,20 @@
+<?php
+require_once __DIR__ . '/includes/bootstrap.php';
+
+// Si ya hay una sesión activa, no tiene sentido mostrar el formulario de ingreso.
+if (!empty($_SESSION['id_usuario'])) {
+    $usuario_sesion = usuario_verificar_activo($conexion, null, false);
+    if ($usuario_sesion) {
+        $destino = (($usuario_sesion['rol_nombre'] ?? '') === 'Administrador') ? 'admin.php' : 'indexprincipal.php';
+        header('Location: ' . app_url($destino));
+        exit();
+    }
+    // Si la cuenta fue desactivada, la sesión se destruyó: se reinicia para el formulario.
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        sesion_iniciar();
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -12,12 +29,13 @@
 
 <body>
 <?php
-include("conexion.php");
 $lista_instituciones = $conexion->query("SELECT id_institucion, nombre FROM instituciones ORDER BY nombre");
 ?>
 
     <div class="login-container">
         <div class="login-card">
+
+            <?php flash_mostrar(); ?>
 
             <!-- Pestañas para alternar entre Login y Registro -->
             <div class="tab-switcher">
@@ -35,6 +53,7 @@ $lista_instituciones = $conexion->query("SELECT id_institucion, nombre FROM inst
                 </div>
 
                 <form id="loginForm" action="login.php" method="POST">
+<?php echo csrf_campo(); ?>
 
                     <div class="form-group">
                         <label for="email">Correo electrónico</label>
@@ -72,6 +91,11 @@ $lista_instituciones = $conexion->query("SELECT id_institucion, nombre FROM inst
                 </div>
 
                 <form id="registerForm" action="registro_usuario.php" method="POST">
+<?php echo csrf_campo(); ?>
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="regSitioWeb">No rellenar</label>
+                        <input type="text" id="regSitioWeb" name="sitio_web" tabindex="-1" autocomplete="off">
+                    </div>
 
                     <div class="form-group">
                         <label for="regNombre">Nombres</label>

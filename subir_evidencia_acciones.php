@@ -1,20 +1,15 @@
 <?php
-session_start();
-include("conexion.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header('Location: ' . app_url('proyectos.php'));
     exit();
 }
+$usuario_actual = requiere_usuario($conexion, 'Estudiante', 'proyectos.php');
+csrf_exigir();
 
-$id_usuario = $_SESSION["id_usuario"];
+$id_usuario = (int)$_SESSION["id_usuario"];
 $rol = $_SESSION["rol"];
-
-// Solo estudiantes suben o eliminan evidencias (validacion del lado del servidor)
-if ($rol !== 'Estudiante' || $_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: proyectos.php");
-    exit();
-}
 
 $accion = $_POST['accion'] ?? '';
 $id_actividad = intval($_POST['id_actividad'] ?? 0);
@@ -26,11 +21,15 @@ if (!is_dir($carpeta)) {
     mkdir($carpeta, 0755, true);
 }
 if (!file_exists($carpeta . ".htaccess")) {
+    // Mismas reglas que el .htaccess versionado. Sin Options ni php_flag:
+    // esas directivas provocan error 500 en hosting compartido (InfinityFree).
     file_put_contents($carpeta . ".htaccess",
-        "Options -Indexes -ExecCGI\n" .
-        "<FilesMatch \"\\.(php|php[0-9]|phtml|phar|pl|py|cgi|sh|exe|html?|js|svg)$\">\n    Require all denied\n</FilesMatch>\n" .
-        "<IfModule mod_php.c>\n    php_flag engine off\n</IfModule>\n" .
-        "<IfModule mod_php8.c>\n    php_flag engine off\n</IfModule>\n");
+        "<IfModule mod_autoindex.c>\n    IndexIgnore *\n</IfModule>\n\n" .
+        "<FilesMatch \"\\.(php|php[0-9]|phtml|phar|pl|py|cgi|sh|exe|html?|js|svg)$\">\n" .
+        "    <IfModule mod_authz_core.c>\n        Require all denied\n    </IfModule>\n" .
+        "    <IfModule !mod_authz_core.c>\n        Order allow,deny\n        Deny from all\n    </IfModule>\n</FilesMatch>\n",
+        LOCK_EX
+    );
 }
 
 // Esta inscrito el estudiante en esta actividad? (y la actividad no esta cancelada)

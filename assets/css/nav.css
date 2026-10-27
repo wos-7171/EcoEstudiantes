@@ -103,6 +103,18 @@
         transform: translateY(-1px);
     }
 
+    .logout-form {
+        display: inline;
+        margin: 0;
+        padding: 0;
+    }
+
+    .logout-form .logout-btn {
+        font: inherit;
+        border: 0;
+        cursor: pointer;
+    }
+
 
     /* ==============================
        MENÚ

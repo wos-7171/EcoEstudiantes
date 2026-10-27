@@ -1,14 +1,9 @@
 <?php
-session_start();
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: ../index.php");
-    exit();
-}
+require_once __DIR__ . '/../includes/bootstrap.php';
+
+$usuario_actual = requiere_usuario($conexion, null, 'indexprincipal.php');
 $rol = $_SESSION["rol"];
 $prefix = "../";
-
-// Conexión a la base de datos subiendo un nivel desde la carpeta 'pages'
-include("../conexion.php");
 
 // Consultar todas las noticias desde la base de datos
 // (fecha_publicacion es el nombre real de la columna en la tabla actual)

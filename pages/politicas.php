@@ -1,9 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: ../index.php");
-    exit();
-}
+require_once __DIR__ . '/../includes/bootstrap.php';
+
+$usuario_actual = requiere_usuario($conexion, null, 'indexprincipal.php');
 $rol = $_SESSION["rol"];
 $prefix = "../";
 ?>
@@ -43,7 +41,7 @@ $prefix = "../";
                         </div>
                     </div>
                     <div>
-                        <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8f极x8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Seguridad y protección de datos" class="section-image">
+                        <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Seguridad y protección de datos" class="section-image">
                         <!-- Imagen importada automáticamente -->
                     </div>
                 </div>

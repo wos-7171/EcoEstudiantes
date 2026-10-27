@@ -1,21 +1,10 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
-    exit();
-}
+$usuario_actual = requiere_usuario($conexion, ['Administrador', 'Docente'], 'proyectos.php');
 
-$id_usuario = $_SESSION["id_usuario"];
+$id_usuario = (int)$_SESSION["id_usuario"];
 $rol = $_SESSION["rol"];
-
-// Solo Administrador o Docente (y el docente solo en sus proyectos)
-if ($rol !== 'Administrador' && $rol !== 'Docente') {
-    header("Location: proyectos.php");
-    exit();
-}
 
 $id_actividad = isset($_GET['id_actividad']) ? intval($_GET['id_actividad']) : 0;
 
@@ -139,6 +128,7 @@ unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
         <?php endif; ?>
 
         <form action="participantes_acciones.php" method="POST" class="acciones-fila" style="margin-top:14px;">
+<?php echo csrf_campo(); ?>
             <input type="hidden" name="accion" value="evaluar">
             <input type="hidden" name="id_participante" value="<?php echo (int)$p['id_participante']; ?>">
             <input type="hidden" name="id_actividad" value="<?php echo $id_actividad; ?>">

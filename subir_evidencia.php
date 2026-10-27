@@ -1,21 +1,10 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
-    exit();
-}
+$usuario_actual = requiere_usuario($conexion, 'Estudiante', 'proyectos.php');
 
-$id_usuario = $_SESSION["id_usuario"];
+$id_usuario = (int)$_SESSION["id_usuario"];
 $rol = $_SESSION["rol"];
-
-// Solo los estudiantes suben evidencias (docentes y admin las revisan en participantes.php)
-if ($rol !== 'Estudiante') {
-    header("Location: proyectos.php");
-    exit();
-}
 
 $id_actividad = isset($_GET['id_actividad']) ? intval($_GET['id_actividad']) : 0;
 
@@ -111,6 +100,7 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
     <?php else: ?>
     <h2>Nueva evidencia</h2>
     <form class="crear" action="subir_evidencia_acciones.php" method="POST" enctype="multipart/form-data">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="subir">
         <input type="hidden" name="id_actividad" value="<?php echo $id_actividad; ?>">
         <label style="font-size:0.85rem; color:#555;">Archivo (foto, video o documento, maximo 20 MB)</label>
@@ -142,6 +132,7 @@ $cancelada = ($actividad['estado'] === 'Cancelada');
             <p><strong><?php echo htmlspecialchars($e['tipo']); ?></strong> - <?php echo date("d/m/Y H:i", strtotime($e['fecha_subida'])); ?></p>
             <?php if ($e['descripcion']): ?><p><?php echo nl2br(htmlspecialchars($e['descripcion'])); ?></p><?php endif; ?>
             <form action="subir_evidencia_acciones.php" method="POST" onsubmit="return confirm('¿Eliminar esta evidencia?');">
+<?php echo csrf_campo(); ?>
                 <input type="hidden" name="accion" value="eliminar">
                 <input type="hidden" name="id_evidencia" value="<?php echo (int)$e['id_evidencia']; ?>">
                 <input type="hidden" name="id_actividad" value="<?php echo $id_actividad; ?>">

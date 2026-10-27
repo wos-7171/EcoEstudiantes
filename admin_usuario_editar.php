@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $usuario_actual = usuario_verificar_activo($conexion, 'Administrador', true);
 
@@ -40,6 +38,7 @@ $res_roles = $conexion->query("SELECT id_rol, nombre FROM roles ORDER BY id_rol"
     <h1>Editar usuario</h1>
     <?php flash_mostrar(); ?>
     <form class="crear" action="admin_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="editar_usuario">
         <input type="hidden" name="id" value="<?php echo (int)$u['id_usuario']; ?>">
         <label style="font-size:0.85rem; color:#555;">Nombres</label>

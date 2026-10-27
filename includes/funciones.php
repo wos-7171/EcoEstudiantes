@@ -29,6 +29,24 @@ function sesion_es_https() {
     return false;
 }
 
+// Devuelve la ruta base de la aplicación (funciona en la raíz o en una subcarpeta).
+function app_base_path() {
+    $script = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? '/'));
+    $dir = rtrim(dirname($script), '/');
+
+    // Las páginas dentro de /pages comparten la raíz de la aplicación.
+    if (preg_match('#/pages$#', $dir)) {
+        $dir = substr($dir, 0, -6);
+    }
+
+    return $dir === '' ? '/' : $dir . '/';
+}
+
+// Construye una URL absoluta a partir de una ruta relativa a la raíz de la app.
+function app_url($ruta = '') {
+    return app_base_path() . ltrim((string)$ruta, '/');
+}
+
 // Inicia la sesion configurando previamente cookies seguras (HttpOnly, SameSite=Lax, Secure condicionado)
 function sesion_iniciar() {
     if (session_status() === PHP_SESSION_NONE) {
@@ -91,9 +109,9 @@ function sesion_controlar_inactividad($segundos_max = 3600, $redirigir = true) {
             sesion_iniciar();
             flash_error('Tu sesión ha expirado por inactividad (60 minutos). Por favor, inicia sesión nuevamente.');
             if (!headers_sent()) {
-                header('Location: index.php');
+                header('Location: ' . app_url('index.php'));
             } else {
-                echo "<script>window.location.href='index.php';</script>";
+                echo "<script>window.location.href=" . json_encode(app_url('index.php')) . ";</script>";
             }
             exit();
         }
@@ -150,6 +168,106 @@ function csrf_validar($token = null) {
     return hash_equals($_SESSION['csrf_token'], $token);
 }
 
+// ========== LIMITE DE INTENTOS DE INICIO DE SESION ==========
+// La tabla se crea de forma diferida. Si el hosting no permite crearla, el
+// control se degrada sin romper el inicio de sesion.
+const LOGIN_MAX_INTENTOS = 5;
+const LOGIN_MINUTOS_BLOQUEO = 15;
+
+function login_intentos_ip() {
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+    return substr($ip, 0, 45);
+}
+
+function login_intentos_tabla($conexion) {
+    static $ok = null;
+    if ($ok !== null) {
+        return $ok;
+    }
+    $sql = "CREATE TABLE IF NOT EXISTS `intentos_login` (
+        `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+        `ip` varchar(45) NOT NULL,
+        `correo` varchar(120) NOT NULL,
+        `intentos` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+        `ultimo_intento` datetime NOT NULL,
+        `bloqueado_hasta` datetime DEFAULT NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uq_intento` (`ip`, `correo`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    $ok = (bool)$conexion->query($sql);
+    if (!$ok) {
+        error_log('EcoEstudiantes: no se pudo preparar intentos_login: ' . $conexion->error);
+    }
+    return $ok;
+}
+
+// Devuelve ['bloqueado' => bool, 'minutos' => int] para la IP y el correo actuales.
+function login_intentos_estado($conexion, $correo) {
+    $libre = ['bloqueado' => false, 'minutos' => 0];
+    if (!login_intentos_tabla($conexion)) {
+        return $libre;
+    }
+    $ip = login_intentos_ip();
+    $correo = mb_strtolower(trim((string)$correo), 'UTF-8');
+
+    $stmt = $conexion->prepare("SELECT bloqueado_hasta FROM intentos_login WHERE ip = ? AND correo = ? LIMIT 1");
+    if (!$stmt) {
+        return $libre;
+    }
+    $stmt->bind_param("ss", $ip, $correo);
+    $stmt->execute();
+    $fila = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if ($fila && !empty($fila['bloqueado_hasta'])) {
+        $restante = strtotime($fila['bloqueado_hasta']) - time();
+        if ($restante > 0) {
+            return ['bloqueado' => true, 'minutos' => (int)ceil($restante / 60)];
+        }
+    }
+    return $libre;
+}
+
+function login_intentos_fallo($conexion, $correo, $max = LOGIN_MAX_INTENTOS, $minutos = LOGIN_MINUTOS_BLOQUEO) {
+    if (!login_intentos_tabla($conexion)) {
+        return;
+    }
+    $ip = login_intentos_ip();
+    $correo = mb_strtolower(trim((string)$correo), 'UTF-8');
+    $ahora = date('Y-m-d H:i:s');
+    $max = max(1, (int)$max);
+    $minutos = max(1, (int)$minutos);
+
+    $sql = "INSERT INTO intentos_login (ip, correo, intentos, ultimo_intento, bloqueado_hasta)
+            VALUES (?, ?, 1, ?, NULL)
+            ON DUPLICATE KEY UPDATE
+                intentos = IF(ultimo_intento < DATE_SUB(VALUES(ultimo_intento), INTERVAL $minutos MINUTE), 1, intentos + 1),
+                ultimo_intento = VALUES(ultimo_intento),
+                bloqueado_hasta = IF(intentos >= $max, DATE_ADD(VALUES(ultimo_intento), INTERVAL $minutos MINUTE), NULL)";
+    $stmt = $conexion->prepare($sql);
+    if (!$stmt) {
+        return;
+    }
+    $stmt->bind_param("sss", $ip, $correo, $ahora);
+    $stmt->execute();
+    $stmt->close();
+}
+
+function login_intentos_limpiar($conexion, $correo) {
+    if (!login_intentos_tabla($conexion)) {
+        return;
+    }
+    $ip = login_intentos_ip();
+    $correo = mb_strtolower(trim((string)$correo), 'UTF-8');
+    $stmt = $conexion->prepare("DELETE FROM intentos_login WHERE ip = ? AND correo = ?");
+    if (!$stmt) {
+        return;
+    }
+    $stmt->bind_param("ss", $ip, $correo);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // Verifica en base de datos si el usuario de la sesion sigue existiendo, activo y con el rol adecuado.
 // Requiere sesion activa.
 function usuario_verificar_activo($conexion, $rol_esperado = null, $auto_redirigir = false) {
@@ -161,9 +279,9 @@ function usuario_verificar_activo($conexion, $rol_esperado = null, $auto_redirig
         if ($auto_redirigir) {
             flash_error('Debes iniciar sesión para acceder.');
             if (!headers_sent()) {
-                header('Location: index.php');
+                header('Location: ' . app_url('index.php'));
             } else {
-                echo "<script>window.location.href='index.php';</script>";
+                echo "<script>window.location.href=" . json_encode(app_url('index.php')) . ";</script>";
             }
             exit();
         }
@@ -196,9 +314,9 @@ function usuario_verificar_activo($conexion, $rol_esperado = null, $auto_redirig
             sesion_iniciar();
             flash_error('Tu cuenta ha sido desactivada. Contacta al administrador.');
             if (!headers_sent()) {
-                header('Location: index.php');
+                header('Location: ' . app_url('index.php'));
             } else {
-                echo "<script>window.location.href='index.php';</script>";
+                echo "<script>window.location.href=" . json_encode(app_url('index.php')) . ";</script>";
             }
             exit();
         }
@@ -225,9 +343,9 @@ function usuario_verificar_activo($conexion, $rol_esperado = null, $auto_redirig
                 flash_error('No tienes permisos suficientes para acceder a este recurso.');
                 $destino = ($usuario['rol_nombre'] === 'Administrador') ? 'admin.php' : 'indexprincipal.php';
                 if (!headers_sent()) {
-                    header("Location: $destino");
+                    header('Location: ' . app_url($destino));
                 } else {
-                    echo "<script>window.location.href='$destino';</script>";
+                    echo "<script>window.location.href=" . json_encode(app_url($destino)) . ";</script>";
                 }
                 exit();
             }

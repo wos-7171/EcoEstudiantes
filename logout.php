@@ -1,7 +1,17 @@
 <?php
-// Cierra la sesion de verdad: borra los datos, la cookie y destruye la sesion.
+/**
+ * Cierre de sesión.
+ * Solo acepta POST con token CSRF para evitar cierres de sesión inducidos por terceros.
+ */
+
 require_once __DIR__ . '/includes/funciones.php';
+sesion_iniciar();
+
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || !csrf_validar()) {
+    header('Location: ' . app_url('index.php'));
+    exit();
+}
+
 sesion_destruir();
-header("Location: index.php");
+header('Location: ' . app_url('index.php'));
 exit();
-?>

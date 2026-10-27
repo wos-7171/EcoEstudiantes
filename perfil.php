@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $usuario_actual = usuario_verificar_activo($conexion, null, true);
 
@@ -69,6 +67,7 @@ if ($rol === 'Estudiante') {
 
     <h2>Datos personales</h2>
     <form class="crear" action="perfil_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="actualizar_datos">
         <label style="font-size:0.85rem; color:#555;">Nombres</label>
         <input type="text" name="nombre" maxlength="80" required value="<?php echo htmlspecialchars($u['nombre']); ?>">
@@ -84,6 +83,7 @@ if ($rol === 'Estudiante') {
 
     <h2>Cambiar contrasena</h2>
     <form class="crear" action="perfil_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="cambiar_clave">
         <label style="font-size:0.85rem; color:#555;">Contrasena actual</label>
         <input type="password" name="actual" required>

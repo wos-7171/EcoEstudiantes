@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $usuario_actual = usuario_verificar_activo($conexion, null, true);
 $id_usuario = (int)$_SESSION["id_usuario"];
@@ -44,6 +42,7 @@ if (!($rol === 'Administrador' || ($rol === 'Docente' && (int)$a['id_responsable
     <h1>Editar actividad</h1>
     <?php flash_mostrar(); ?>
     <form class="crear" action="actividades_acciones.php" method="POST">
+<?php echo csrf_campo(); ?>
         <input type="hidden" name="accion" value="editar">
         <input type="hidden" name="id_actividad" value="<?php echo (int)$a['id_actividad']; ?>">
         <label style="font-size:0.85rem; color:#555;">Nombre</label>

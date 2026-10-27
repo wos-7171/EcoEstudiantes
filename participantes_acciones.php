@@ -1,20 +1,15 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header('Location: ' . app_url('proyectos.php'));
     exit();
 }
+$usuario_actual = requiere_usuario($conexion, ['Administrador', 'Docente'], 'proyectos.php');
+csrf_exigir();
 
-$id_usuario = $_SESSION["id_usuario"];
+$id_usuario = (int)$_SESSION["id_usuario"];
 $rol = $_SESSION["rol"];
-
-if (($rol !== 'Administrador' && $rol !== 'Docente') || $_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: proyectos.php");
-    exit();
-}
 
 $accion = $_POST['accion'] ?? '';
 $id_actividad = intval($_POST['id_actividad'] ?? 0);

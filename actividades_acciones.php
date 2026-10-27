@@ -1,16 +1,12 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: index.php");
-    exit();
-}
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: proyectos.php");
+    header('Location: ' . app_url('proyectos.php'));
     exit();
 }
+$usuario_actual = requiere_usuario($conexion, null, 'indexprincipal.php');
+csrf_exigir();
 
 $id_usuario = (int)$_SESSION["id_usuario"];
 $rol = $_SESSION["rol"];

@@ -1,12 +1,12 @@
 <?php
-session_start();
-include("conexion.php");
-include("funciones.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-if (!isset($_SESSION["id_usuario"]) || $_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: index.php");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header('Location: ' . app_url('perfil.php'));
     exit();
 }
+$usuario_actual = requiere_usuario($conexion, null, 'indexprincipal.php');
+csrf_exigir();
 
 $id_usuario = (int)$_SESSION["id_usuario"];
 $accion = $_POST['accion'] ?? '';

@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/funciones.php';
-sesion_iniciar();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $usuario_actual = usuario_verificar_activo($conexion, 'Administrador', true);
 $rol = $_SESSION["rol"];
@@ -46,6 +44,7 @@ $res = $conexion->query(
                 <td>
                     <?php if ((int)$i['num_usuarios'] === 0 && (int)$i['num_proyectos'] === 0 && (int)$i['id_institucion'] !== 1): ?>
                     <form action="instituciones_acciones.php" method="POST" onsubmit="return confirm('¿Eliminar esta institucion?')">
+<?php echo csrf_campo(); ?>
                         <input type="hidden" name="accion" value="eliminar">
                         <input type="hidden" name="id" value="<?php echo (int)$i['id_institucion']; ?>">
                         <button type="submit" class="link-del">Eliminar</button>
